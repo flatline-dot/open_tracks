@@ -1,15 +1,10 @@
 import serial
 import threading
-import queue
 from serial.tools.list_ports import comports
 import time
 
 
-
-list_comports = [i.device for i in comports()]
-
-queued = queue.Queue()
-
+threading_result = []
 sputnik_values = {
     1: 'GPS',
     2: 'CLN',
@@ -44,57 +39,49 @@ sputnik_values = {
     }
 
 request = b''
-for i in ['10', '39', '10', '03']:
+for i in ('10', '39', '10', '03'):
     request += bytes.fromhex(i)
 
 
-def parse_binr(port, request, queued):
+def listen_ports():
+    return [i.device for i in comports()]
+
+
+def parse_binr(port):
     com = serial.Serial(port=port)
     com.parity = serial.PARITY_ODD
     com.baudrate = 115200
     com.bytesize = serial.EIGHTBITS
     com.timeout = 5
 
-    systems_result = []
-    channals = {'device': port}
     com.write(request)
-    
     response = com.read(2000)
-    
+
+    response_list_systems = []
+    result = {}
+
     start = 2
     for _ in range(96):
-        systems_result.append(response[start:start + 1])
+        response_list_systems.append(response[start:start + 1])
         start += 20
 
-    # channals_test = [int(i.hex(), 16) for i in result]
-    
+    result = {sputnik_values[sputnik]: response_list_systems.count(sputnik) for sputnik in sputnik_values}
+    result['device'] = port
 
-    for num, system in enumerate(systems_result):
-        if int(system.hex(), 16) in sputnik_values:
-            channals[num + 1] = sputnik_values[int(system.hex(), 16)]
-        else:
-            channals[num + 1] = 'Выкл.'
-            
-    queued.put(channals)
-    return channals
+    threading_result.append(result)
+    return result
 
 
-def running(list_comports, request, queued):
+def running(list_comports):
     for port in list_comports:
-        thread_ = threading.Thread(target=parse_binr, args=(port, request, queued))
+        thread_ = threading.Thread(target=parse_binr, args=(port))
         thread_.start()
         thread_.join()
-    
 
-    
+
 if __name__ == '__main__':
-    #for port in list_comports:
-        #res = parse_binr(port, request)
-        #for num, sput in enumerate(res):
-            #print(num + 1, sputnik_values.setdefault(sput, 'Выкл'))
     start = time.time()
-    running(list_comports, request, queued)
-    print(queued.get())
+    running(listen_ports())
     end = time.time()
     print(end - start)
     
