@@ -6,7 +6,20 @@ lst =[]
 
 
 def listen_ports():
-    pass
+    a = {'GLN': 1, 'GPS': 1, 'SPAS': 1}
+    res = ''
+    for i in a:
+        test = i + ': ' + str(a[i]) + '\n'
+        res += test
+    for i in lst:
+        i['text'] = res
+
+
+a = {'GLN': 2, 'GPS': 3, 'SPAS': 1}
+res = ''
+for i in a:
+    test = i + ': ' + str(a[i]) + '\n'
+    res += test
 
 
 window = Tk()
@@ -23,13 +36,13 @@ for i in range(4):
             relief=RAISED
         )
         frame.grid(row=i, column=j)
-        label = Label(name=str(all_ports[c].lower()), master=frame, text=str(all_ports[c]), width=35, height=4)
+        label = Label(name=str(all_ports[c].lower()), master=frame, text=res, width=35, height=4)
         c += 1
         lst.append(label)
         label.pack()
 
 
-btn = Button(master=window, text='Проверка соединения', command=smth, height=3)
+btn = Button(master=window, text='Проверка соединения', command=listen_ports, height=3)
 btn.grid(column=1, row=4)
 btn.grid()
 window.mainloop()

@@ -3,6 +3,7 @@ import threading
 from serial.tools.list_ports import comports
 import time
 
+from frontend import Interface
 
 threading_result = []
 sputnik_values = {
@@ -47,6 +48,13 @@ def listen_ports():
     return [i.device for i in comports()]
 
 
+def render_valid_ports():
+    print(window.frame_ports)
+    for i in window.frame_ports:
+        if i['text'] in ['COM1']:
+            i['background'] = 'red'
+
+
 def parse_binr(port):
     com = serial.Serial(port=port)
     com.parity = serial.PARITY_ODD
@@ -80,9 +88,9 @@ def running(list_comports):
 
 
 if __name__ == '__main__':
-    start = time.time()
-    running(listen_ports())
-    end = time.time()
-    print(end - start)
+    window = Interface()
+    window.create_frame()
+    window.create_button('Тест', command=render_valid_ports)
+    window.mainloop()
     
     
