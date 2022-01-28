@@ -44,15 +44,16 @@ for i in ('10', '39', '10', '03'):
     request += bytes.fromhex(i)
 
 
-def listen_ports():
+def valid_ports():
     return [i.device for i in comports()]
 
 
-def render_valid_ports():
-    print(window.frame_ports)
+def check_connections():
     for i in window.frame_ports:
-        if i['text'] in ['COM1']:
-            i['background'] = 'red'
+        if i['text'] in valid_ports():
+            i['background'] = 'yellow'
+        else:
+            i['background'] = 'white'
 
 
 def parse_binr(port):
@@ -81,7 +82,7 @@ def parse_binr(port):
 
 
 def running(list_comports):
-    for port in list_comports:
+    for port in valid_ports:
         thread_ = threading.Thread(target=parse_binr, args=(port))
         thread_.start()
         thread_.join()
@@ -90,7 +91,7 @@ def running(list_comports):
 if __name__ == '__main__':
     window = Interface()
     window.create_frame()
-    window.create_button('Тест', command=render_valid_ports)
+    window.create_button('Проверка соединения', command=check_connections)
     window.mainloop()
     
     

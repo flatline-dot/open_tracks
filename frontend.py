@@ -17,13 +17,13 @@ class Interface(Tk):
                 self.frame = Frame(height=100, master=self, borderwidth=2, relief=RAISED)
                 self.frame.grid(row=i, column=j)
 
-                self.label = Label(master=self.frame, text=self.all_ports[num], width=35, height=4)
+                self.label = Label(master=self.frame, text=self.all_ports[num], width=35, height=4, background='white')
                 num += 1
                 self.frame_ports.append(self.label)
                 self.label.pack()
 
     def create_button(self, text, command):
-        self.button = Button(master=self, text=text, height=2, width=10, command=command)
+        self.button = Button(master=self, text=text, height=2, width=20, command=command)
         self.button.grid(column=1, row=4)
 
 
