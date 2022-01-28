@@ -8,35 +8,16 @@ from frontend import Interface
 threading_result = []
 sputnik_values = {
     1: 'GPS',
-    2: 'CLN',
-    3: 'GLN L2',
-    33: 'GLN L2',
-    4: 'SBAS',
-    5: 'GLN PC',
-    17: 'GLN PC',
-    6: 'GLN L2 PC',
-    49: 'GLN L2 PC',
-    8: 'Galileo E1B',
-    24: 'Galileo E1C',
-    40: 'Galileo E5a Data',
-    56: 'Galileo E5a Pilot',
-    72: 'Galileo E5b Data',
-    88: 'Galileo E5b Pilot',
-    65: 'GLN 3D',
-    81: 'GLN 3P',
-    193: 'GLN L3_T',
-    130: 'GPS_T',
-    129: 'GLN_T',
-    161: 'GLN L2_T',
-    162: 'GPS L2_T',
-    34: 'GPS L2C-M',
+    2: 'ГЛН',
+    3: 'ГЛН L2',
+    101: 'ГЛН L1OCp',
+    100: 'ГЛН L1OCd',
+    102: 'ГЛН L1SCd',
+    105: 'ГЛН L2OCp',
+    104: 'ГЛН L2КСИ',
+    106: 'ГЛН L2SCd',
     50: 'GPS L2C-L',
-    194: 'GPS L5_T',
-    66: 'GPS L5i',
-    82: 'GPS L5q',
-    68: 'SBAS L5i',
-    84: 'SBAS L5q',
-    9: 'BDS B1I'
+    34: 'GPS L2C-M'
     }
 
 request = b''
@@ -61,7 +42,7 @@ def parse_binr(port):
     com.parity = serial.PARITY_ODD
     com.baudrate = 115200
     com.bytesize = serial.EIGHTBITS
-    com.timeout = 5
+    com.timeout = 1
 
     com.write(request)
     response = com.read(2000)
@@ -71,19 +52,21 @@ def parse_binr(port):
 
     start = 2
     for _ in range(96):
-        response_list_systems.append(response[start:start + 1])
+        response_list_systems.append(int(response[start:start + 1].hex(), 16))
         start += 20
 
     result = {sputnik_values[sputnik]: response_list_systems.count(sputnik) for sputnik in sputnik_values}
     result['device'] = port
-
+    print(result)
     threading_result.append(result)
     return result
 
 
-def running(list_comports):
-    for port in valid_ports:
-        thread_ = threading.Thread(target=parse_binr, args=(port))
+def running():
+    ports = valid_ports()
+    print(ports)
+    for port in ports:
+        thread_ = threading.Thread(target=parse_binr, args=[port])
         thread_.start()
         thread_.join()
 
@@ -91,7 +74,7 @@ def running(list_comports):
 if __name__ == '__main__':
     window = Interface()
     window.create_frame()
-    window.create_button('Проверка соединения', command=check_connections)
+    window.create_button('Проверка соединения', command=running)
     window.mainloop()
     
     
