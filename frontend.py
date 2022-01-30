@@ -2,13 +2,16 @@ from tkinter import Tk, Frame, RAISED, Label, Button
 
 
 class Interface(Tk):
+    all_ports = ('COM' + str(i) for i in range(1, 17))
+    frame_ports = []
+
     def __init__(self):
         super().__init__()
         self.wm_state('zoomed')
-        self.all_ports = ('COM' + str(i) for i in range(1, 17))
-        self.frame_ports = []
+        self.title('channal_review')
 
-    def get_str(self, port_name, content):
+    @staticmethod
+    def get_str(port_name, content):
         start_info = port_name + '\n\n'
         for i in content:
             start_info += i + ': ' + str(content[i]) + '\n'
@@ -28,17 +31,19 @@ class Interface(Tk):
         }
         for i in range(4):
             for j in range(4):
-                self.frame = Frame(height=100, master=self, borderwidth=2, relief=RAISED)
-                self.frame.grid(row=i, column=j)
+                frame = Frame(height=100, master=self, borderwidth=2, relief=RAISED)
+                frame.grid(row=i, column=j)
 
-                self.label = Label(name=next(self.all_ports).lower(), master=self.frame, width=50, height=12, background='white', font='Times 11')
-                self.label.content = content
-                self.label['text'] = self.get_str(self.label._name.upper(), content)
-                self.frame_ports.append(self.label)
-                self.label.pack()
+                label = Label(name=next(self.all_ports).lower(), master=frame, width=50, height=12, background='white', font='Times 11')
+                label.content = content
+                label['text'] = self.get_str(label._name.upper(), content)
+                self.frame_ports.append(label)
+                label.pack()
 
-    def create_button(self, text, command):
-        self.button = Button(master=self, text=text, height=2, width=20, command=command)
-        self.button.grid(column=1, row=4)
+    def create_button(self, check, run):
+        self.button = Button(master=self, text='Проверка соединения', height=2, width=20, command=check)
+        self.button.grid(pady=12, column=1, padx=10, sticky='E')
+        self.button1 = Button(master=self, text='Тест', height=2, width=20, command=run)
+        self.button1.grid(pady=12, row=4, column=2, sticky='W')
 
 
