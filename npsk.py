@@ -35,6 +35,14 @@ def check_connections():
             i['background'] = 'yellow'
         else:
             i['background'] = 'white'
+    for i in window.frame_ports:
+        content = {
+            'GPS': 0,
+            'ГЛН': 0,
+            'ГЛН L2': 0,}
+
+        i.content = content
+        i['text'] = window.get_str(i._name.upper(), content)
 
 
 def parse_binr(port):
@@ -62,6 +70,16 @@ def parse_binr(port):
     return result
 
 
+def render():
+    for res in result:
+        for frame in window.frame_ports:
+            if res['device'] == frame._name:
+                clear = del res['device']
+                frame.content = clear
+                frame['text'] = window.get_str(frame._name, clear)
+    window.create_frame()
+
+
 def running():
     ports = valid_ports()
     print(ports)
@@ -70,11 +88,13 @@ def running():
         thread_.start()
         thread_.join()
 
+    render()
+
 
 if __name__ == '__main__':
     window = Interface()
     window.create_frame()
-    window.create_button('Проверка соединения', command=running)
+    window.create_button('Проверка соединения', command=check_connections)
     window.mainloop()
     
     
