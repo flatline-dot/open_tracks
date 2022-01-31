@@ -29,9 +29,13 @@ def valid_ports():
     return [i.device for i in comports()]
 
 
+
 def check_connections():
+    
+    
     for i in window.frame_ports:
-        if i['text'] in valid_ports():
+        
+        if i._name.upper() in valid_ports():
             i['background'] = 'yellow'
         else:
             i['background'] = 'white'
@@ -46,35 +50,42 @@ def parse_binr(port):
     com.timeout = 1
 
     com.write(request)
-    response = com.read(2000)
+    response = com.read(4000)
+    response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+    print(len(response_clear))
 
     response_list_systems = []
+    
     result = {}
 
     start = 2
     for _ in range(96):
-        response_list_systems.append(int(response[start:start + 1].hex(), 16))
+        response_list_systems.append(int(response_clear[start:start + 1].hex(), 16))
         start += 20
-
+    print(response_list_systems)
+    
     result = {sputnik_values[sputnik]: response_list_systems.count(sputnik) for sputnik in sputnik_values}
     result['device'] = port
-    print(result)
+    
     threading_result.append(result)
     return result
 
 
 def render():
+    global threading_result
     for res in threading_result:
         for frame in window.frame_ports:
-            if res['device'] == frame._name:
+            if res['device'] == frame._name.upper():
                 del res['device']
                 frame.content = res
-                frame['text'] = window.get_str(frame._name, res)
+                frame['text'] = window.get_str(frame._name.upper(), res)
+                break
+    threading_result = []
 
 
 def running():
     ports = valid_ports()
-    print(ports)
+    
     for port in ports:
         thread_ = threading.Thread(target=parse_binr, args=[port])
         thread_.start()
