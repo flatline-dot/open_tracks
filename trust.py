@@ -1,69 +1,53 @@
 from tkinter import *
 
 window = Tk()
-size = window.winfo_screenwidth()
-size1 = window.winfo_screenheight()
-s = window.winfo_screen()
-print(s)
-window.geometry(f"{int(size * 0.3)}x500")
+size_width = window.winfo_screenwidth()
+size_height = window.winfo_screenheight()
+window.geometry(f"{size_width}x{size_height}")
+print(size_width * 0.3)
 
-frame = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame.grid(columnspan=1)
-label = Label(frame, text='ДЫиапозона', borderwidth=1, font='Times 12', width=5, height=1, background='silver',)
-label.grid()
-
-frame1 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame1.grid(row=0, column=1)
-label1 = Label(frame1, text='Кол-во в сценарии', borderwidth=1, font='Times 12', width=5, height=1, background='silver',)
-label1.grid()
+class Headers():
+    def __init__(self, window, size_width, col, pad):
+        self.title = Frame(window, height=3, borderwidth=1, relief=RAISED)
+        self.title.grid(row=0, column=col, columnspan=4, sticky='ew')
+        self.title_label = Label(self.title, text='COM', borderwidth=1, width=4)
+        self.title_label.grid()
 
 
-frame2 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame2.grid(row=0, column=2)
-label2 = Label(frame2, text='Обнаружено', borderwidth=1, font='Times 12', width=5, height=1, background='silver')
-label2.grid()
+        self.frame_names = Frame(window, height=5, relief=RAISED, borderwidth=1)
+        self.frame_names.grid(column=0 + col, row=1, sticky='e')
+        self.label_names = Label(self.frame_names, text='Диапозон', borderwidth=1, font='Times 10', width=int(size_width * 0.0085), height=2,
+                            background='silver', )
+        self.label_names.grid()
 
+        self.frame_const = Frame(window, height=5, relief=RAISED, borderwidth=1)
+        self.frame_const.grid(row=1, column=1 + col,)
+        self.label_const = Label(self.frame_const, text='ТУ', borderwidth=1, font='Times 10', width=int(size_width * 0.0022), height=2,
+                            background='silver', )
+        self.label_const.grid()
 
+        self.frame_count = Frame(window, height=5, relief=RAISED, borderwidth=1)
+        self.frame_count.grid(row=1, column=2 + col)
+        self.frame_count = Label(self.frame_count, text='Факт.', borderwidth=1, font='Times 10', width=int(size_width * 0.003), height=2,
+                            background='silver')
+        self.frame_count.grid()
 
-frame3 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame3.grid(row=0, column=3)
-label3 = Label(frame3, text='Решение', borderwidth=1, font='Times 12', width=5, height=1, background='silver')
-label3.grid()
-
-
-for i in range(1, 18):
-    for j in range(4):
-        frame = Frame(window, height=5, relief=RAISED, borderwidth=1)
-        frame.grid(row=i, column=j, sticky='ew')
-        label = Label(frame, borderwidth=1)
-        label.grid()
-
-
-
-frame = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame.grid(column=4, row=0)
-label = Label(frame, text='Диапозон', borderwidth=1, font='Times 12', width=5, height=1, background='silver',)
-label.grid()
-
-frame1 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame1.grid(row=0, column=5)
-label1 = Label(frame1, text='Кол-во в сценарии', borderwidth=1, font='Times 12', width=5, height=1, background='silver')
-label1.grid()
-
-
-frame2 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame2.grid(row=0, column=6)
-label2 = Label(frame2, text='Обнаружено', borderwidth=1, font='Times 12', width=5, height=1, background='silver')
-label2.grid()
+        self.frame_status = Frame(window, height=5, relief=RAISED, borderwidth=1)
+        self.frame_status.grid(row=1, column=3 + col)
+        self.label_status = Label(self.frame_status, text='Cтатус', borderwidth=1, font='Times 10', width=int(size_width * 0.0032), height=2,
+                             background='silver')
+        self.label_status.grid()
 
 
 
-frame3 = Frame(window, height=5, relief=RAISED, borderwidth=1)
-frame3.grid(row=0, column=7)
-label3 = Label(frame3, text='Решение', borderwidth=1, font='Times 12', width=5, height=1, background='silver')
-label3.grid()
 
-
-
+Headers(window, size_width, 0, 0)
+Headers(window, size_width, 4, 5)
+Headers(window, size_width, 8, 5)
+Headers(window, size_width, 12, 5)
+Headers(window, size_width, 16, 5)
+Headers(window, size_width, 20, 5)
+Headers(window, size_width, 24, 5)
+Headers(window, size_width, 28, 5)
 
 window.mainloop()
