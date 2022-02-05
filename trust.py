@@ -11,7 +11,7 @@ class Headers():
     def __init__(self, window, size_width, col, pad):
         self.title = Frame(window, height=3, borderwidth=1, relief=RAISED)
         self.title.grid(row=0, column=col, columnspan=4, sticky='ew')
-        self.title_label = Label(self.title, text='COM', borderwidth=1, width=4)
+        self.title_label = Label(self.title, text='COM', borderwidth=1, width=int(size_width * 0.0087) + int(size_width * 0.0022) + int(size_width * 0.003) + int(size_width * 0.0037))
         self.title_label.grid()
 
 
