@@ -7,7 +7,8 @@ class Interface(Tk):
 
     def __init__(self):
         super().__init__()
-        self.wm_state('zoomed')
+        #self.wm_state('zoomed')
+        self.geometry('1200x800')
         self.title('channal_review')
 
     @staticmethod
@@ -22,6 +23,8 @@ class Interface(Tk):
             'GPS': 0,
             'ГЛН': 0,
             'ГЛН L2': 0,
+            'ГЛН L1OCp': 0,
+            'ГЛН L1OCd': 0,
             'ГЛН L1SCd': 0,
             'ГЛН L2OCp': 0,
             'ГЛН L2КСИ': 0,
@@ -34,10 +37,11 @@ class Interface(Tk):
                 frame = Frame(height=100, master=self, borderwidth=2, relief=RAISED)
                 frame.grid(row=i, column=j)
 
-                label = Label(name=next(self.all_ports).lower(), master=frame, width=50, height=12, background='white', font='Times 11')
+                label = Label(name=next(self.all_ports).lower(), master=frame, width=50, height=13, background='white', font='Times 7')
                 label.content = content
                 label['text'] = self.get_str(label._name.upper(), content)
                 self.frame_ports.append(label)
+                
                 label.pack()
 
     def create_button(self, check, run):
