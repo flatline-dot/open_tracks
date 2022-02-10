@@ -11,42 +11,43 @@ TU_W = int(window.winfo_screenwidth() / 64)
 FACT_W = int(window.winfo_screenwidth() / 53.3)
 STATUS_W = int(window.winfo_screenwidth() / 40)
 HEAD_H = int(window.winfo_screenheight() / 33.3)
-BODY_H = int(window.winfo_screenheight() / 50)
+BODY_H = int(window.winfo_screenheight() / 49)
 PAD_X = (int(window.winfo_screenwidth() / 70), 0)
 
 
 class Table():
+    #__slots__ = ('number', 'gln_l1of_label', 'gln_l1of_tu_label', 'gln_l1of_fact_label', 'gln_l1of_status_label')
     def __init__(self, window, col=0, row=0, port=None, name_w=0, tu_w=0, fact_w=0, status_w=0, head_h=0, pad_x=(0, 0), body_font='Times 8', body_h=BODY_H):
         self.number = port
 
         """Header"""
         title = Frame(window, borderwidth=1, relief='solid')
         title.grid(row=0 + row, column=col, columnspan=4, sticky='ew', padx=pad_x)
-        title_label = Label(title, text='COM' + port, font='Arial 12')
+        title_label = Label(title, text='COM' + port, font='Cambria 12 bold')
         title_label.grid()
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
         frame_names.grid_propagate(False)
-        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font='Times 10', background='#bbd0f2')
+        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font='Times 10 bold', background='#bbd0f2')
         label_names.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h, background='#bbd0f2')
         frame_const.grid(row=1 + row, column=1 + col)
         frame_const.grid_propagate(False)
-        label_const = Label(frame_const, text='ТУ', font='Times 10', background='#bbd0f2')
+        label_const = Label(frame_const, text='ТУ', font='Times 10 bold', background='#bbd0f2')
         label_const.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h, background='#bbd0f2')
         frame_count.grid(row=1 + row, column=2 + col)
         frame_count.grid_propagate(False)
-        frame_count = Label(frame_count, text='Факт.', font='Times 9', background='#bbd0f2')
+        frame_count = Label(frame_count, text='Факт.', font='Times 9 bold', background='#bbd0f2')
         frame_count.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
         frame_status.grid_propagate(False)
-        label_status = Label(frame_status, text='Cтатус', font='Times 10', background='#bbd0f2')
+        label_status = Label(frame_status, text='Cтатус', font='Times 9 bold', background='#bbd0f2')
         label_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OF"""
@@ -73,7 +74,7 @@ class Table():
         gln_l1of_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         gln_l1of_status.grid(row=2 + row, column=3 + col)
         gln_l1of_status.grid_propagate(False)
-        self.gln_l1of_status_label = Label(gln_l1of_status, text='', font=body_font)
+        self.gln_l1of_status_label = Label(gln_l1of_status, text='', font=body_font, width=8, height=5, background='green')
         self.gln_l1of_status_label.value = False
         self.gln_l1of_status_label.place(relx=0.5, rely=0.5, anchor='center')
 
@@ -401,14 +402,14 @@ class Table():
 
         gln_l2sc_d_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         gln_l2sc_d_fact.grid(row=12 + row, column=2 + col, sticky='s')
-        gln_l2sc_d_tu.grid_propagate(False)
+        gln_l2sc_d_fact.grid_propagate(False)
         self.gln_l2sc_d_fact_label = Label(gln_l2sc_d_fact, text='', font=body_font)
         self.gln_l2sc_d_fact_label.value = 0
         self.gln_l2sc_d_fact_label.place(relx=0.5, rely=0.5, anchor='center')
 
         gln_l2sc_d_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         gln_l2sc_d_status.grid(row=12 + row, column=3 + col, sticky='s')
-        gln_l2sc_d_tu.grid_propagate(False)
+        gln_l2sc_d_status.grid_propagate(False)
         self.gln_l2sc_d_status_label = Label(gln_l2sc_d_status, text='', font=body_font)
         self.gln_l2sc_d_status_label.value = False
         self.gln_l2sc_d_status_label.place(relx=0.5, rely=0.5, anchor='center')
@@ -437,7 +438,7 @@ class Table():
         gps_l1_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         gps_l1_status.grid(row=13 + row, column=3 + col)
         gps_l1_status.grid_propagate(False)
-        self.gps_l1_status_label = Label(gps_l1_status, text='', font=body_h)
+        self.gps_l1_status_label = Label(gps_l1_status, text='', font=body_font)
         self.gps_l1_status_label.value = False
         self.gps_l1_status_label.place(relx=0.5, rely=0.5, anchor='center')
         
@@ -584,23 +585,23 @@ Table(window, col=24, row=19, port=str(15), name_w=NAME_W, tu_w=TU_W, fact_w=FAC
 Table(window, col=28, row=19, port=str(16), name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=PAD_X)
 end_time = time.time()
 res = start_time - end_time
-print(a.__dict__)
-frame_check = Frame(window, width=120, height=40, background='white')
-frame_check.grid(columnspan=3, column=12, row=37, pady=HEAD_H, sticky='ew')
+print(res)
+frame_check = Frame(window, width=120, height=45, background='white')
+frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
 frame_check.grid_propagate(False)
-check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9', borderwidth=2, background='white', width=20, height=1)
+check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue')
 check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
-frame_start = Frame(window, width=70, height=40, background='white')
-frame_start.grid(columnspan=2, column=15, row=37, pady=HEAD_H, sticky='e')
+frame_start = Frame(window, width=80, height=45, background='white')
+frame_start.grid(columnspan=2, column=14, row=37, pady=HEAD_H)
 frame_start.grid_propagate(False)
-start = Button(frame_start, text='Старт', font='Arial 9', borderwidth=2, background='white', width=8, height=1)
+start = Button(frame_start, text='Старт', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue')
 start.place(relx=0.5, rely=0.5, anchor='center')
 
-frame_stop = Frame(window, width=70, height=40, background='white')
-frame_stop.grid(columnspan=3, column=17, row=37, pady=HEAD_H)
+frame_stop = Frame(window, width=80, height=45, background='white')
+frame_stop.grid(columnspan=3, column=16, row=37, pady=HEAD_H)
 frame_stop.grid_propagate(False)
-start = Button(frame_stop, text='Cтоп', font='Arial 9', borderwidth=2, background='white', width=8, height=1)
+start = Button(frame_stop, text='Cтоп', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', highlightbackground='blue')
 start.place(relx=0.5, rely=0.5, anchor='center')
 
 
