@@ -44,7 +44,7 @@ class Table():
         self.title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
         self.title.grid_propagate(False)
         self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x)
-        self.title_label = Label(self.title, text='COM' + port, font='Cambria 12 bold', background='white')
+        self.title_label = Label(self.title, text=port, font='Cambria 12 bold', background='white')
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
