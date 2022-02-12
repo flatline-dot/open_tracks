@@ -34,17 +34,17 @@ class Table():
                  'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status',
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status',
                  'sdps_tu', 'sdps_fact', 'sdps_status',
-                 'title_label'
+                 'title_label', 'title'
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font='Times 8', body_h=BODY_H):
         self.number = port
         Table.table_ports.append(self)
         """Headers"""
-        title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
-        title.grid_propagate(False)
-        title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x)
-        self.title_label = Label(title, text='COM' + port, font='Cambria 12 bold', background='white')
+        self.title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
+        self.title.grid_propagate(False)
+        self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x)
+        self.title_label = Label(self.title, text='COM' + port, font='Cambria 12 bold', background='white')
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
@@ -552,9 +552,6 @@ Table(window, col=12, row=19, port=str(12), pad_x=PAD_X)
 Table(window, col=16, row=19, port=str(13), pad_x=PAD_X)
 Table(window, col=20, row=19, port=str(14), pad_x=PAD_X)
 Table(window, col=24, row=19, port=str(15), pad_x=PAD_X)
-Table(window, col=28, row=19, port=str(16), pad_x=PAD_X)
-end_time = time.time()
-res = start_time - end_time
 
 frame_check = Frame(window, width=120, height=45, background='white')
 frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')

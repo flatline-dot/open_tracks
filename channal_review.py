@@ -1,8 +1,7 @@
 import serial
 import threading
 from serial.tools.list_ports import comports
-import time
-from frontend import Interface
+import interface
 
 
 threading_result = []
@@ -30,16 +29,12 @@ def valid_ports():
 
 
 
-def check_connections():
-    
-    
-    for i in window.frame_ports:
-        
-        if i._name.upper() in valid_ports():
-            i['background'] = 'yellow'
-        else:
-            i['background'] = 'white'
-
+def check_connections(table_ports):
+    active_ports = [i.device for i in comports()]
+    for table in table_ports:
+        if table in active_ports:
+            table.title['background'] = 'yellow'
+            table.title_label['background'] = 'yellow'
 
 
 def parse_binr(port):
@@ -95,9 +90,43 @@ def running():
 
 
 if __name__ == '__main__':
-    window = Interface()
-    window.create_frame()
-    window.create_button(check_connections, running)
+    Table(window, col=0, row=0, port=str(1))
+    Table(window, col=4, row=0, port=str(2), pad_x=PAD_X)
+    Table(window, col=8, row=0, port=str(3), pad_x=PAD_X)
+    Table(window, col=12, row=0, port=str(4), pad_x=PAD_X)
+    Table(window, col=16, row=0, port=str(5), pad_x=PAD_X)
+    Table(window, col=20, row=0, port=str(6), pad_x=PAD_X)
+    Table(window, col=24, row=0, port=str(7), pad_x=PAD_X)
+    Table(window, col=28, row=0, port=str(8), pad_x=PAD_X)
+    Table(window, col=0, row=19, port=str(9))
+    Table(window, col=4, row=19, port=str(10), pad_x=PAD_X)
+    Table(window, col=8, row=19, port=str(11), pad_x=PAD_X)
+    Table(window, col=12, row=19, port=str(12), pad_x=PAD_X)
+    Table(window, col=16, row=19, port=str(13), pad_x=PAD_X)
+    Table(window, col=20, row=19, port=str(14), pad_x=PAD_X)
+    Table(window, col=24, row=19, port=str(15), pad_x=PAD_X)
+    Table(window, col=28, row=19, port=str(16), pad_x=PAD_X)
+
+    frame_check = Frame(window, width=120, height=45, background='white')
+    frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
+    frame_check.grid_propagate(False)
+    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=check_conection)
+    check_conection.place(relx=0.5, rely=0.5, anchor='center')
+
+    frame_start = Frame(window, width=80, height=45, background='white')
+    frame_start.grid(columnspan=3, column=14, row=37, pady=HEAD_H)
+    frame_start.grid_propagate(False)
+    start = Button(frame_start, text='Старт', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue')
+    start.place(relx=0.5, rely=0.5, anchor='center')
+
+    frame_stop = Frame(window, width=80, height=45, background='white')
+    frame_stop.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='e')
+    frame_stop.grid_propagate(False)
+    start = Button(frame_stop, text='Cтоп', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', highlightbackground='blue')
+    start.place(relx=0.5, rely=0.5, anchor='center')
+
+
+
     window.mainloop()
     
     
