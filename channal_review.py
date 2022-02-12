@@ -6,22 +6,28 @@ from interface import *
 
 threading_result = []
 sputnik_values = {
-    1: 'GPS',
-    2: 'ГЛН',
-    3: 'ГЛН L2',
-    101: 'ГЛН L1OCp',
-    100: 'ГЛН L1OCd',
-    102: 'ГЛН L1SCd',
-    105: 'ГЛН L2OCp',
-    104: 'ГЛН L2КСИ',
-    106: 'ГЛН L2SCd',
-    50: 'GPS L2C-L',
-    34: 'GPS L2C-M'
+    'gln_l1of': 2,
+    'gln_l1sf': 5 ,
+    'gln_l2of': 3,
+    'gln_l2sf': 6,
+    'gln_l1oc_p': 101,
+    'gln_l1oc_d': 100,
+    'gln_l1sc_p': 103,
+    'gln_l1sc_d': 102,
+    'gln_l2oc_p': 105,
+    'gln_l2oc_ksi': 104,
+    'gln_l2sc_p': 107,
+    'gln_l2sc_d': 106,
+    'gps_l1': 1,
+    'gps_l2_l': 50,
+    'gps_l2_m': 34,
+    'sdkm': 4,
+    'sdps': 4
     }
 
-request = b''
-for i in ('10', '39', '10', '03'):
-    request += bytes.fromhex(i)
+request = bytearray()
+for code in ('10', '39', '10', '03'):
+    request.append(int(code, 16))
 
 
 def valid_ports():
@@ -30,63 +36,59 @@ def valid_ports():
 
 
 def check_connections(table_ports):
-    active_ports = [i.device for i in comports()]
+    active_ports = (i.device for i in comports())
     for table in table_ports:
         if table.number in active_ports:
             table.title['background'] = 'yellow'
             table.title_label['background'] = 'yellow'
 
 
-def parse_binr(port):
-    com = serial.Serial(port=port)
+def parse_binr(table_port):
+    com = serial.Serial(port=table_port.number)
     com.parity = serial.PARITY_ODD
     com.baudrate = 115200
     com.bytesize = serial.EIGHTBITS
     com.timeout = 1
+    stop_read = bytearray([int('10', 16), int('03', 16)])
 
     com.write(request)
-    response = com.read(4000)
-    response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-    print(len(response_clear))
+    while True:
+        response = com.read_until(stop_read)
+        response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+        print(len(response_clear))
+        code_list = []   
+        count_results = {}
 
-    response_list_systems = []
+        start = 2
+        for _ in range(96):
+            code_list.append(int(response_clear[start:start + 1].hex(), 16))
+            start += 20
     
-    result = {}
+        count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
+       
 
-    start = 2
-    for _ in range(96):
-        response_list_systems.append(int(response_clear[start:start + 1].hex(), 16))
-        start += 20
-    print(response_list_systems)
-    
-    result = {sputnik_values[sputnik]: response_list_systems.count(sputnik) for sputnik in sputnik_values}
-    result['device'] = port
-    
-    threading_result.append(result)
-    return result
+        for result in count_results:
+            if getattr(table_port, result + '_status')['background'] != 'green':
 
+                fact = getattr(table_port, result + '_fact')
+                fact['text'] = count_result[result]
 
-def render():
-    global threading_result
-    for res in threading_result:
-        for frame in window.frame_ports:
-            if res['device'] == frame._name.upper():
-                del res['device']
-                frame.content = res
-                frame['text'] = window.get_str(frame._name.upper(), res)
-                break
-    threading_result = []
+                #if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')) <= 2:
+                 #   status = getattr(table_port, result + '_status')
+                  #  status['background'] == 'green'
+            else:
+                continue
 
 
 def running():
-    ports = valid_ports()
+    active_ports = [i.device for i in comports()]
+    table_ports = [port for port in Table.table_ports if port.number in active_ports]
     
-    for port in ports:
+    for table_port in table_ports:
         thread_ = threading.Thread(target=parse_binr, args=[port])
         thread_.start()
         thread_.join()
 
-    render()
 
 
 if __name__ == '__main__':
@@ -116,7 +118,7 @@ if __name__ == '__main__':
     frame_start = Frame(window, width=80, height=45, background='white')
     frame_start.grid(columnspan=3, column=14, row=37, pady=HEAD_H)
     frame_start.grid_propagate(False)
-    start = Button(frame_start, text='Старт', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue')
+    start = Button(frame_start, text='Старт', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', command=running)
     start.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')

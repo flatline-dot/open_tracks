@@ -17,7 +17,7 @@ PAD_X = (int(window.winfo_screenwidth() / 70), 0)
 
 class Table():
     table_ports = []
-    __slots__ = ('number', 'gln_l1of_tu', 'gln_l1of_fact', 'gln_l1of_status',
+    __slots__ = ('gln_l1of_tu', 'gln_l1of_fact', 'gln_l1of_status',
                  'gln_l1sf_tu', 'gln_l1sf_fact', 'gln_l1sf_status',
                  'gln_l2of_tu', 'gln_l2of_fact', 'gln_l2of_status',
                  'gln_l2sf_tu', 'gln_l2sf_fact', 'gln_l2sf_status',
@@ -34,7 +34,7 @@ class Table():
                  'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status',
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status',
                  'sdps_tu', 'sdps_fact', 'sdps_status',
-                 'title_label', 'title'
+                 'title_label', 'title', 'number'
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font='Times 8', body_h=BODY_H):
