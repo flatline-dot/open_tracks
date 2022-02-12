@@ -1,7 +1,7 @@
 import serial
 import threading
 from serial.tools.list_ports import comports
-import interface
+from interface import *
 
 
 threading_result = []
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     frame_check = Frame(window, width=120, height=45, background='white')
     frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=check_conection)
+    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=check_connection(Table.table_ports))
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_start = Frame(window, width=80, height=45, background='white')
