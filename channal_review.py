@@ -53,7 +53,9 @@ def parse_binr(table_port):
 
     com.write(request)
     while True:
+        com.write(request)
         response = com.read_until(stop_read)
+        print(len(response))
         response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
         print(len(response_clear))
         code_list = []   
@@ -73,7 +75,7 @@ def parse_binr(table_port):
                 fact = getattr(table_port, result + '_fact')
                 fact['text'] = count_results[result]
 
-                if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')) <= 2:
+                if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2:
                     status = getattr(table_port, result + '_status')
                     status['background'] == 'green'
             else:

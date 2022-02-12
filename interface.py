@@ -87,7 +87,7 @@ class Table():
         l1of_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1of_fact.grid(row=2 + row, column=2 + col)
         l1of_fact.grid_propagate(False)
-        self.gln_l1of_fact = Label(l1of_fact, text='', font=body_font)
+        self.gln_l1of_fact = Label(l1of_fact, text='0', font=body_font)
         self.gln_l1of_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1of_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -112,7 +112,7 @@ class Table():
         l1sf_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1sf_fact.grid(row=3 + row, column=2 + col)
         l1sf_fact.grid_propagate(False)
-        self.gln_l1sf_fact = Label(l1sf_fact, text='', font=body_font)
+        self.gln_l1sf_fact = Label(l1sf_fact, text='0', font=body_font)
         self.gln_l1sf_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1sf_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -137,7 +137,7 @@ class Table():
         l2of_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2of_fact.grid(row=4 + row, column=2 + col)
         l2of_fact.grid_propagate(False)
-        self.gln_l2of_fact = Label(l2of_fact, text='', font=body_font)
+        self.gln_l2of_fact = Label(l2of_fact, text='0', font=body_font)
         self.gln_l2of_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2of_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -162,7 +162,7 @@ class Table():
         l2sf_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2sf_fact.grid(row=5 + row, column=2 + col)
         l2sf_fact.grid_propagate(False)
-        self.gln_l2sf_fact = Label(l2sf_fact, text='', font=body_font)
+        self.gln_l2sf_fact = Label(l2sf_fact, text='0', font=body_font)
         self.gln_l2sf_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2sf_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -194,7 +194,7 @@ class Table():
         l1oc_p_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1oc_p_fact.grid(row=6 + row, column=2 + col, sticky='n')
         l1oc_p_fact.grid_propagate(False)
-        self.gln_l1oc_p_fact = Label(l1oc_p_fact, text='', font=body_font)
+        self.gln_l1oc_p_fact = Label(l1oc_p_fact, text='0', font=body_font)
         self.gln_l1oc_p_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1oc_p_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -219,7 +219,7 @@ class Table():
         l1oc_d_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1oc_d_fact.grid(row=6 + row, column=2 + col, sticky='s')
         l1oc_d_fact.grid_propagate(False)
-        self.gln_l1oc_d_fact = Label(l1oc_d_fact, text='', font=body_font)
+        self.gln_l1oc_d_fact = Label(l1oc_d_fact, text='0', font=body_font)
         self.gln_l1oc_d_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1oc_d_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -251,7 +251,7 @@ class Table():
         l1sc_p_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1sc_p_fact.grid(row=8 + row, column=2 + col, sticky='n')
         l1sc_p_fact.grid_propagate(False)
-        self.gln_l1sc_p_fact = Label(l1sc_p_fact, text='', font=body_font)
+        self.gln_l1sc_p_fact = Label(l1sc_p_fact, text='0', font=body_font)
         self.gln_l1sc_p_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1sc_p_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -276,7 +276,7 @@ class Table():
         l1sc_d_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1sc_d_fact.grid(row=8 + row, column=2 + col, sticky='s')
         l1sc_d_fact.grid_propagate(False)
-        self.gln_l1sc_d_fact= Label(l1sc_d_fact, text='', font=body_font)
+        self.gln_l1sc_d_fact= Label(l1sc_d_fact, text='0', font=body_font)
         self.gln_l1sc_d_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l1sc_d_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -308,7 +308,7 @@ class Table():
         l2oc_p_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2oc_p_fact.grid(row=10 + row, column=2 + col, sticky='n')
         l2oc_p_fact.grid_propagate(False)
-        self.gln_l2oc_p_fact = Label(l2oc_p_fact, text='', font=body_font)
+        self.gln_l2oc_p_fact = Label(l2oc_p_fact, text='0', font=body_font)
         self.gln_l2oc_p_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2oc_p_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -333,7 +333,7 @@ class Table():
         l2oc_ksi_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2oc_ksi_fact.grid(row=10 + row, column=2 + col, sticky='s')
         l2oc_ksi_fact.grid_propagate(False)
-        self.gln_l2oc_ksi_fact = Label(l2oc_ksi_fact, text='', font=body_font)
+        self.gln_l2oc_ksi_fact = Label(l2oc_ksi_fact, text='0', font=body_font)
         self.gln_l2oc_ksi_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2oc_ksi_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -365,7 +365,7 @@ class Table():
         l2sc_p_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2sc_p_fact.grid(row=12 + row, column=2 + col, sticky='n')
         l2sc_p_fact.grid_propagate(False)
-        self.gln_l2sc_p_fact = Label(l2sc_p_fact, text='', font=body_font)
+        self.gln_l2sc_p_fact = Label(l2sc_p_fact, text='0', font=body_font)
         self.gln_l2sc_p_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2sc_p_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -390,7 +390,7 @@ class Table():
         l2sc_d_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l2sc_d_fact.grid(row=12 + row, column=2 + col, sticky='s')
         l2sc_d_fact.grid_propagate(False)
-        self.gln_l2sc_d_fact = Label(l2sc_d_fact, text='', font=body_font)
+        self.gln_l2sc_d_fact = Label(l2sc_d_fact, text='0', font=body_font)
         self.gln_l2sc_d_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         l2sc_d_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -415,7 +415,7 @@ class Table():
         gps_l1_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         gps_l1_fact.grid(row=13 + row, column=2 + col)
         gps_l1_fact.grid_propagate(False)
-        self.gps_l1_fact = Label(gps_l1_fact, text='', font=body_font)
+        self.gps_l1_fact = Label(gps_l1_fact, text='0', font=body_font)
         self.gps_l1_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         gps_l1_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -447,7 +447,7 @@ class Table():
         gps_l2_l_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         gps_l2_l_fact.grid(row=14 + row, column=2 + col, sticky='n')
         gps_l2_l_fact.grid_propagate(False)
-        self.gps_l2_l_fact = Label(gps_l2_l_fact, text='', font=body_font)
+        self.gps_l2_l_fact = Label(gps_l2_l_fact, text='0', font=body_font)
         self.gps_l2_l_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         gps_l2_l_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -472,7 +472,7 @@ class Table():
         gps_l2_m_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         gps_l2_m_fact.grid(row=14 + row, column=2 + col, sticky='s')
         gps_l2_m_fact.grid_propagate(False)
-        self.gps_l2_m_fact = Label(gps_l2_m_fact, text='', font=body_font)
+        self.gps_l2_m_fact = Label(gps_l2_m_fact, text='0', font=body_font)
         self.gps_l2_m_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         gps_l2_m_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -497,7 +497,7 @@ class Table():
         sdkm_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         sdkm_fact.grid(row=15 + row, column=2 + col)
         sdkm_fact.grid_propagate(False)
-        self.sdkm_fact = Label(sdkm_fact, text='', font=body_font)
+        self.sdkm_fact = Label(sdkm_fact, text='0', font=body_font)
         self.sdkm_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         sdkm_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -522,7 +522,7 @@ class Table():
         sdps_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         sdps_fact.grid(row=16 + row, column=2 + col)
         sdps_fact.grid_propagate(False)
-        self.sdps_fact = Label(sdps_fact, text='', font=body_font)
+        self.sdps_fact = Label(sdps_fact, text='0', font=body_font)
         self.sdps_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         sdps_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
@@ -533,6 +533,3 @@ class Table():
 
         pas_frame = Frame(window, height=20)
         pas_frame.grid(row=17)
-
-
-    
