@@ -32,7 +32,7 @@ def valid_ports():
 def check_connections(table_ports):
     active_ports = [i.device for i in comports()]
     for table in table_ports:
-        if table in active_ports:
+        if table.number in active_ports:
             table.title['background'] = 'yellow'
             table.title_label['background'] = 'yellow'
 
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     frame_check = Frame(window, width=120, height=45, background='white')
     frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=check_connection(Table.table_ports))
+    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=lambda: check_connections(Table.table_ports))
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_start = Frame(window, width=80, height=45, background='white')
