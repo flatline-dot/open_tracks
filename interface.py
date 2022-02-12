@@ -534,3 +534,28 @@ class Table():
         pas_frame = Frame(window, height=20)
         pas_frame.grid(row=17)
 
+
+
+a = Table(window, col=0, row=0, port='COM1')
+Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
+Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
+Table(window, col=12, row=0, port='COM4', pad_x=PAD_X)
+Table(window, col=16, row=0, port='COM5', pad_x=PAD_X)
+Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
+Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
+Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
+Table(window, col=0, row=19, port='COM9')
+Table(window, col=4, row=19, port='COM10', pad_x=PAD_X)
+Table(window, col=8, row=19, port='COM11', pad_x=PAD_X)
+Table(window, col=12, row=19, port='COM12', pad_x=PAD_X)
+Table(window, col=16, row=19, port='COM13', pad_x=PAD_X)
+Table(window, col=20, row=19, port='COM14', pad_x=PAD_X)
+Table(window, col=24, row=19, port='COM15', pad_x=PAD_X)
+Table(window, col=28, row=19, port='COM16', pad_x=PAD_X)
+
+result = 'sdps'
+status = getattr(a, result + '_status')
+status['background'] = 'green'
+
+window.mainloop()
+    
