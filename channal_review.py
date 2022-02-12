@@ -52,32 +52,32 @@ def parse_binr(table_port):
     stop_read = bytearray([int('10', 16), int('03', 16)])
 
     com.write(request)
-    while True:
-        response = com.read_until(stop_read)
-        response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-        print(len(response_clear))
-        code_list = []   
-        count_results = {}
-
-        start = 2
-        for _ in range(96):
-            code_list.append(int(response_clear[start:start + 1].hex(), 16))
-            start += 20
     
-        count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
+    response = com.read_until(stop_read)
+    response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+    print(len(response_clear))
+    code_list = []   
+    count_results = {}
+
+    start = 2
+    for _ in range(96):
+        code_list.append(int(response_clear[start:start + 1].hex(), 16))
+        start += 20
+    
+    count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
        
 
-        for result in count_results:
-            if getattr(table_port, result + '_status')['background'] != 'green':
+    for result in count_results:
+        if getattr(table_port, result + '_status')['background'] != 'green':
 
-                fact = getattr(table_port, result + '_fact')
-                fact['text'] = count_result[result]
+            fact = getattr(table_port, result + '_fact')
+            fact['text'] = count_result[result]
 
-                #if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')) <= 2:
-                 #   status = getattr(table_port, result + '_status')
-                  #  status['background'] == 'green'
-            else:
-                continue
+            #if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')) <= 2:
+                #   status = getattr(table_port, result + '_status')
+                #  status['background'] == 'green'
+        else:
+            continue
 
 
 def running():
