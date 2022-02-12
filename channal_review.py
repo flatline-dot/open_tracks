@@ -30,13 +30,8 @@ for code in ('10', '39', '10', '03'):
     request.append(int(code, 16))
 
 
-def valid_ports():
-    return [i.device for i in comports()]
-
-
-
 def check_connections(table_ports):
-    active_ports = (i.device for i in comports())
+    active_ports = [i.device for i in comports()]
     for table in table_ports:
         if table.number in active_ports:
             table.title['background'] = 'yellow'
@@ -70,16 +65,15 @@ def parse_binr(table_port):
        
 
         for result in count_results:
-            if getattr(table_port, result + '_status')['background'] != 'green':
+            fact = getattr(table_port, result + '_fact')
+            fact['text'] = count_results[result]
 
-                fact = getattr(table_port, result + '_fact')
-                fact['text'] = count_results[result]
-
-                if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2:
-                    status = getattr(table_port, result + '_status')
-                    status['background'] == 'green'
+            if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2:
+                status = getattr(table_port, result + '_status')
+                status['background'] == '#1db546'
             else:
-                continue
+                status['background'] == 'red'
+    
 
 
 def running():
@@ -87,7 +81,7 @@ def running():
     table_ports = [port for port in Table.table_ports if port.number in active_ports]
     
     for table_port in table_ports:
-        thread_ = threading.Thread(target=parse_binr, args=[port])
+        thread_ = threading.Thread(target=parse_binr, args=[table_port])
         thread_.start()
         #thread_.join()
 
