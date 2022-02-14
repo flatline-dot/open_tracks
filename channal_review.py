@@ -1,6 +1,7 @@
 import serial
 import threading
 from serial.tools.list_ports import comports
+from time import time
 from interface import *
 
 
@@ -46,8 +47,9 @@ def parse_binr(table_port):
     com.timeout = 1
     stop_read = bytearray([int('10', 16), int('03', 16)])
 
-    com.write(request)
+   
     while True:
+        start = time()
         com.write(request)
         response = com.read_until(stop_read)
         print(len(response))
@@ -62,19 +64,22 @@ def parse_binr(table_port):
             start += 20
     
         count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
-       
-
+        end = time()
+        res_time = end - start
+        print(res_time)
+        start_rend = time()
         for result in count_results:
             fact = getattr(table_port, result + '_fact')
             fact['text'] = count_results[result]
 
             if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2:
                 status = getattr(table_port, result + '_status')
-                status['background'] == '#1db546'
+                status['background'] = '#1db546'
             else:
-                status['background'] == 'red'
+                status['background'] = '#ed1818'
     
-
+        end_rend = time()
+        res_time_rend = end_start - end_rend
 
 def running():
     active_ports = [i.device for i in comports()]
