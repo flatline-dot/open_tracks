@@ -7,6 +7,7 @@ from interface import *
 
 threading_result = []
 sputnik_values = {
+
     'gln_l1of': 2,
     'gln_l1sf': 5 ,
     'gln_l2of': 3,
@@ -24,10 +25,11 @@ sputnik_values = {
     'gps_l2_m': 34,
     'sdkm': 4,
     'sdps': 4
+
     }
 
 request = bytearray()
-for code in ('10', '39', '10', '03'):
+for code in ('10', '39', '01', '10', '03'):
     request.append(int(code, 16))
 
 
@@ -47,10 +49,9 @@ def parse_binr(table_port):
     com.timeout = 1
     stop_read = bytearray([int('10', 16), int('03', 16)])
 
-   
+    com.write(request)
     while True:
         start = time()
-        com.write(request)
         response = com.read_until(stop_read)
         print(len(response))
         response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -72,7 +73,7 @@ def parse_binr(table_port):
             fact = getattr(table_port, result + '_fact')
             fact['text'] = count_results[result]
 
-            if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2:
+            if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2 and int(getattr(table_port, result + '_fact')['text']) != 0 :
                 status = getattr(table_port, result + '_status')
                 status['background'] = '#1db546'
             else:
