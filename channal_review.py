@@ -29,7 +29,7 @@ sputnik_values = {
     }
 
 request = bytearray()
-for code in ('10', '39', '01', '10', '03'):
+for code in ('10', '39', '03', '10', '03'):
     request.append(int(code, 16))
 
 
@@ -41,55 +41,98 @@ def check_connections(table_ports):
             table.title_label['background'] = 'yellow'
 
 
-def parse_binr(table_port):
-    com = serial.Serial(port=table_port.number)
+def ports_init(name):
+    com = Serial(port=name)
     com.parity = serial.PARITY_ODD
     com.baudrate = 115200
     com.bytesize = serial.EIGHTBITS
     com.timeout = 1
-    stop_read = bytearray([int('10', 16), int('03', 16)])
+    return com
 
-    com.write(request)
+
+def read_binr(com):
+    response = b''
     while True:
-        start = time()
-        response = com.read_until(stop_read)
-        print(len(response))
-        response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-        print(len(response_clear))
-        code_list = []   
-        count_results = {}
+        if com.in_waiting:
+            while True:
+                byte = com.read()
+            
+                if byte == bytes.fromhex('03') and response[-1] == bytes.fromhex('10') and response[-2] != bytes.fromhex('10'):
+                    response += byte
+                    break
+                else:
+                    response += byte
+            break
 
-        start = 2
-        for _ in range(96):
-            code_list.append(int(response_clear[start:start + 1].hex(), 16))
-            start += 20
+        else:
+            continue
+
+    print(len(response))
+    print((response_clear))
+    return (com, response)
+
+
+def parse_binr(com_response):
+    com, response = port_response
+    code_list = []
+    response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+
+    start = 2
+    for _ in range(96):
+        code_list.append(int(response_clear[start:start + 1].hex(), 16))
+        start += 20
     
-        count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
-        end = time()
-        res_time = end - start
-        print(res_time)
-        start_rend = time()
-        for result in count_results:
-            fact = getattr(table_port, result + '_fact')
-            fact['text'] = count_results[result]
+    count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
+    return (com, count_results)
 
-            if int(getattr(table_port, result + '_tu')['text']) - int(getattr(table_port, result + '_fact')['text']) <= 2 and int(getattr(table_port, result + '_fact')['text']) != 0 :
+
+def rendering(com_results):
+    com, results = port_results
+    for table_port in Table.table_ports:
+        if com.port == table_port.number:
+            for result in results:
+                fact = getattr(table_port, result + '_fact')
+                fact['text'] = count_results[result]
                 status = getattr(table_port, result + '_status')
-                status['background'] = '#1db546'
-            else:
-                status['background'] = '#ed1818'
-    
-        end_rend = time()
-        res_time_rend = end_start - end_rend
+
+                if int(getattr(table_port, result + '_tu')['text']) - int(fact['text']) <= 2 and int(fact['text']) != 0:
+                    status['background'] = '#1db546'
+                else:
+                    status['background'] = '#ed1818'
+        break
+
+
 
 def running():
-    active_ports = [i.device for i in comports()]
-    table_ports = [port for port in Table.table_ports if port.number in active_ports]
-    
-    for table_port in table_ports:
-        thread_ = threading.Thread(target=parse_binr, args=[table_port])
-        thread_.start()
-        #thread_.join()
+    listen_ports = [i.device for i in comports()]
+    active_ports = [ports_init(port) for port in listen_ports]
+    [port.write(request) for port in active_ports]
+    read_results = []
+    parse_results = []
+    while True:
+        with ThreadPoolExecutor(len(active_ports)) as executor:
+            features = [executor.submit(read_binr, port) for port in active_ports]
+            for feature in features:
+                read_result.append(feature.result())
+
+        with ThreadPoolExecutor(len(active_ports)) as executor:
+            features = [executor.submit(parse_binr, port) for port in read_results]
+            for feature in features:
+                parse_results.append(feature.result())
+
+
+        for port in parse_results:
+            rendering(port)
+
+
+#def running():
+#    active_ports = [i.device for i in comports()]
+#    table_ports = [port for port in Table.table_ports if port.number in active_ports]
+#    
+#    for table_port in table_ports:
+#        thread_ = threading.Thread(target=parse_binr, args=[table_port])
+#        thread_.start()
+#        #thread_.join()
 
 
 

@@ -1,6 +1,6 @@
 import time
 from tkinter import Tk, Frame, Label, Button
-
+from serial import Serial
 window = Tk()
 window.wm_state('zoomed')
 window.title('review')
@@ -38,8 +38,8 @@ class Table():
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font='Times 8', body_h=BODY_H):
-        self.number = port
         Table.table_ports.append(self)
+        self.number = port
         """Headers"""
         self.title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
         self.title.grid_propagate(False)
@@ -118,7 +118,7 @@ class Table():
         l1sf_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         l1sf_status.grid(row=3 + row, column=3 + col)
         l1sf_status.grid_propagate(False)
-        self.gln_l1sf_status = Label(l1sf_status, text='', font=body_font, width=8, background='#1db546')
+        self.gln_l1sf_status = Label(l1sf_status, text='', font=body_font, width=8)
         self.gln_l1sf_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2OF"""
