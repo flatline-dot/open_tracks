@@ -1,7 +1,7 @@
 import serial
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from serial.tools.list_ports import comports
-from time import time
+import time
 from interface import *
 
 
@@ -29,7 +29,7 @@ sputnik_values = {
     }
 
 request = bytearray()
-for code in ('10', '39', '03', '10', '03'):
+for code in ('10', '39', '01', '10', '03'):
     request.append(int(code, 16))
 
 
@@ -50,30 +50,31 @@ def ports_init(name):
     return com
 
 
-def read_binr(com):
-    response = b''
+def read_binr(com): 
     while True:
-        if com.in_waiting:
+        response = b''
+        start = time.time()
+        if com.in_waiting:    
             while True:
                 byte = com.read()
-            
-                if byte == bytes.fromhex('03') and response[-1] == bytes.fromhex('10') and response[-2] != bytes.fromhex('10'):
+                if (byte == bytes.fromhex('03')) and (response[-1] == 16) and (response[-2] != 16):
                     response += byte
                     break
                 else:
                     response += byte
-            break
-
+            end = time.time()
+            res = end - start
+            print(len(response))
+            print(res)
+            return (com, response)
+            
         else:
             continue
-
-    print(len(response))
-    print((response_clear))
-    return (com, response)
-
+    
 
 def parse_binr(com_response):
-    com, response = port_response
+    start_s = time.time()
+    com, response = com_response
     code_list = []
     response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
 
@@ -83,6 +84,11 @@ def parse_binr(com_response):
         start += 20
     
     count_results = {sputnik: code_list.count(sputnik_values[sputnik]) for sputnik in sputnik_values}
+    time.sleep(3)
+    end = time.time()
+    
+    res = end - start_s
+    print(res)
     return (com, count_results)
 
 
@@ -106,6 +112,8 @@ def rendering(com_results):
 def running():
     listen_ports = [i.device for i in comports()]
     active_ports = [ports_init(port) for port in listen_ports]
+    print(listen_ports)
+    print(active_ports)
     [port.write(request) for port in active_ports]
     read_results = []
     parse_results = []
@@ -113,16 +121,20 @@ def running():
         with ThreadPoolExecutor(len(active_ports)) as executor:
             features = [executor.submit(read_binr, port) for port in active_ports]
             for feature in features:
-                read_result.append(feature.result())
+                read_results.append(feature.result())
+                
+        
+            
 
         with ThreadPoolExecutor(len(active_ports)) as executor:
             features = [executor.submit(parse_binr, port) for port in read_results]
             for feature in features:
                 parse_results.append(feature.result())
 
-
-        for port in parse_results:
-            rendering(port)
+        print(parse_results)
+        break
+        #for port in parse_results:
+            #rendering(port)
 
 
 #def running():
