@@ -50,7 +50,7 @@ def ports_init(name):
     return com
 
 
-def read_binr(com): 
+def read_binr(com):
     while True:
         response = b''
         start = time.time()
@@ -69,7 +69,7 @@ def read_binr(com):
             return (com, response)
             
         else:
-            continue
+            return None
     
 
 def parse_binr(com_response):
@@ -93,12 +93,12 @@ def parse_binr(com_response):
 
 
 def rendering(com_results):
-    com, results = port_results
+    com, results = com_results
     for table_port in Table.table_ports:
         if com.port == table_port.number:
             for result in results:
                 fact = getattr(table_port, result + '_fact')
-                fact['text'] = count_results[result]
+                fact['text'] = results[result]
                 status = getattr(table_port, result + '_status')
 
                 if int(getattr(table_port, result + '_tu')['text']) - int(fact['text']) <= 2 and int(fact['text']) != 0:
