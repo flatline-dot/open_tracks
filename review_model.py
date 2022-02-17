@@ -1,5 +1,5 @@
 import serial
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from serial.tools.list_ports import comports
 import time
 from interface import *
@@ -32,9 +32,15 @@ class ParsingComports():
         for code in ('10', '39', '01', '10', '03'):
             self.request.append(int(code, 16))
 
+        self.check_request = bytearray()
+        for code in ('10', '39', '10', '03'):
+            self.check_request.append(int(code, 16))    
+
     def check_connections(self):
         self.active_names = []
+        instance_ports = []
         access_ports = [i.device for i in comports()]
+        
         for port in access_ports:
             com = serial.Serial(port=port)
             com.parity = serial.PARITY_ODD
@@ -42,23 +48,29 @@ class ParsingComports():
             com.bytesize = serial.EIGHTBITS
             com.timeout = 1
 
-            com.write(self.request)
+            com.write(self.check_request)
+            instance_ports.append(com)
+
+        time.sleep(1)
+        for com in instance_ports:
             if com.in_waiting:
-                self.active_names.append(port)
+                self.active_names.append(com.port)
                 com.reset_input_buffer()
-                com.__del__()
 
-            else:
-                com.__del__()
-
+        for i in instance_ports:
+            i.__del__()       
         for port in Table.table_ports:
             if port.number in self.active_names:
                 port.title['background'] = 'yellow'
                 port.title_label['background'] = 'yellow'
+            else:
+                port.title['background'] = 'white'
+                port.title_label['background'] = 'white'
+        print(self.active_names)
 
     def init_comports(self):
         active_ports = []
-        if self.active_names:
+        if 'active_names' in self.__dict__:
             for name in self.active_names:
                 com = serial.Serial(port=name)
                 com.parity = serial.PARITY_ODD
@@ -75,8 +87,152 @@ class ParsingComports():
                 com.parity = serial.PARITY_ODD
                 com.baudrate = 115200
                 com.bytesize = serial.EIGHTBITS
-                com.timeout = 1
+                com.timeout = 2
 
                 active_ports.append(com)
 
         return active_ports
+
+    def read_binr(self, com):
+        response = b''  
+        while True:
+            byte = com.read()
+            if (byte == bytes.fromhex('03')) and (response[-1] == 16) and (response[-2] != 16):
+                response += byte
+                break
+            else:
+                response += byte
+        return (com.port, response)
+
+    def parse_binr(self, com_response):
+        com, response = com_response
+        code_list = []
+        response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+
+        start = 2
+        for _ in range(96):
+            code_list.append(int(response_clear[start:start + 1].hex(), 16))
+            start += 20
+        
+        count_results = {sputnik: code_list.count(self.sputnik_values[sputnik]) for sputnik in self.sputnik_values}
+
+        return (com, count_results)
+
+    def rendering(self, com_results):
+        com, results = com_results
+        for table_port in Table.table_ports:
+            if com == table_port.number:
+                for result in results:
+                    fact = getattr(table_port, result + '_fact')
+                    fact['text'] = results[result]
+                    status = getattr(table_port, result + '_status')
+
+                    if int(getattr(table_port, result + '_tu')['text']) - int(fact['text']) <= 2 and int(fact['text']) != 0:
+                        frame = getattr(table_port, result + '_status_frame')
+                        frame['background'] = '#1db546'
+                        status['background'] = '#1db546'
+                    else:
+                        frame = getattr(table_port, result + '_status_frame')
+                        frame['background'] = '#ed1818'
+                        status['background'] = '#ed1818'
+            
+
+
+
+
+
+def start():
+    active_ports = comport.init_comports()
+    [port.write(comport.request) for port in active_ports]
+    read_results = []
+    parse_results = []
+    
+    #with ThreadPoolExecutor(len(active_ports)) as executor:
+    #        
+    #        features = [executor.submit(comport.read_binr, port) for port in active_ports]
+    #        for feature in as_completed(features):
+    #            read_results.append(feature.result())
+    #
+    
+    #strat_time = time.time()
+    #for port in active_ports:
+    #    resp = comport.read_binr(port)
+    #    read_results.append(resp)
+#
+    #
+    #for result in read_results:
+    #    parse = comport.parse_binr(result)
+    #    parse_results.append(parse)
+    #
+    #for parse in parse_results:
+    #    comport.rendering(parse)
+    #end_time = time.time()
+    #res_time = end_time - strat_time   
+    #print(res_time)
+    #
+    def running():
+        strat_time = time.time()
+        for port in active_ports:
+            resp = comport.read_binr(port)
+            read_results.append(resp)
+
+        
+        for result in read_results:
+            parse = comport.parse_binr(result)
+            parse_results.append(parse)
+        
+        for parse in parse_results:
+            comport.rendering(parse)
+        end_time = time.time()
+        res_time = end_time - strat_time
+        print(res_time)
+        Tk.after(window, 50, running)
+        
+    
+    running()
+
+
+if __name__ == '__main__':
+    comport = ParsingComports()
+    
+
+
+    Table(window, col=0, row=0, port='COM1')
+    Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
+    Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
+    Table(window, col=12, row=0, port='COM4', pad_x=PAD_X)
+    Table(window, col=16, row=0, port='COM5', pad_x=PAD_X)
+    Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
+    Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
+    Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
+    Table(window, col=0, row=19, port='COM9')
+    Table(window, col=4, row=19, port='COM10', pad_x=PAD_X)
+    Table(window, col=8, row=19, port='COM11', pad_x=PAD_X)
+    Table(window, col=12, row=19, port='COM12', pad_x=PAD_X)
+    Table(window, col=16, row=19, port='COM13', pad_x=PAD_X)
+    Table(window, col=20, row=19, port='COM14', pad_x=PAD_X)
+    Table(window, col=24, row=19, port='COM15', pad_x=PAD_X)
+    Table(window, col=28, row=19, port='COM16', pad_x=PAD_X)
+
+    frame_check = Frame(window, width=120, height=45, background='white')
+    frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
+    frame_check.grid_propagate(False)
+    check_conection = Button(frame_check, text='Проверка соединения', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=20, height=2, fg='blue', command=comport.check_connections)
+    check_conection.place(relx=0.5, rely=0.5, anchor='center')
+
+    frame_start = Frame(window, width=80, height=45, background='white')
+    frame_start.grid(columnspan=3, column=14, row=37, pady=HEAD_H)
+    frame_start.grid_propagate(False)
+    start = Button(frame_start, text='Старт', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', command=start)
+    start.place(relx=0.5, rely=0.5, anchor='center')
+
+    frame_stop = Frame(window, width=80, height=45, background='white')
+    frame_stop.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='e')
+    frame_stop.grid_propagate(False)
+    start = Button(frame_stop, text='Cтоп', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', highlightbackground='blue')
+    start.place(relx=0.5, rely=0.5, anchor='center')
+
+
+
+    window.mainloop()
+    
