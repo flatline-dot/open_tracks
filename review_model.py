@@ -28,18 +28,17 @@ class ParsingComports():
 
                                 }
 
-        self.request = bytearray()
-        for code in ('10', '39', '01', '10', '03'):
-            self.request.append(int(code, 16))
-
-        self.check_request = bytearray()
-        for code in ('10', '39', '10', '03'):
-            self.check_request.append(int(code, 16))    
+        self.request = bytearray([16, 57, 1, 16, 3])
+        self.check_request = bytearray([16, 57, 16, 3])
+        self.stop_request = bytearray([16, 14, 16, 3])
+        self.is_run = True
+            
 
     def check_connections(self):
         self.active_names = []
         instance_ports = []
         access_ports = [i.device for i in comports()]
+        print(access_ports)
         
         for port in access_ports:
             com = serial.Serial(port=port)
@@ -69,7 +68,7 @@ class ParsingComports():
         print(self.active_names)
 
     def init_comports(self):
-        active_ports = []
+        self.active_ports = []
         if 'active_names' in self.__dict__:
             for name in self.active_names:
                 com = serial.Serial(port=name)
@@ -78,7 +77,7 @@ class ParsingComports():
                 com.bytesize = serial.EIGHTBITS
                 com.timeout = 1
 
-                active_ports.append(com)
+                self.active_ports.append(com)
 
         else:
             self.check_connections()
@@ -87,22 +86,26 @@ class ParsingComports():
                 com.parity = serial.PARITY_ODD
                 com.baudrate = 115200
                 com.bytesize = serial.EIGHTBITS
-                com.timeout = 2
+                com.timeout = 1
 
-                active_ports.append(com)
+                self.active_ports.append(com)
 
-        return active_ports
+        return self.active_ports
 
     def read_binr(self, com):
-        response = b''  
+        #strat_time = time.time()
+        response = b''
         while True:
-            byte = com.read()
-            if (byte == bytes.fromhex('03')) and (response[-1] == 16) and (response[-2] != 16):
-                response += byte
-                break
-            else:
-                response += byte
-        return (com.port, response)
+            if com.in_waiting and com.in_waiting > 3:
+                start = time.time()
+                response += com.read(com.in_waiting)
+
+                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
+                    com.reset_input_buffer()
+                    #end_time = time.time()
+                    #res_time = end_time - strat_time
+                    #print(res_time)
+                    return (com.port, response)
 
     def parse_binr(self, com_response):
         com, response = com_response
@@ -135,68 +138,46 @@ class ParsingComports():
                         frame = getattr(table_port, result + '_status_frame')
                         frame['background'] = '#ed1818'
                         status['background'] = '#ed1818'
-            
-
-
-
-
-
+   
 def start():
+    comport.is_run = True
     active_ports = comport.init_comports()
     [port.write(comport.request) for port in active_ports]
-    read_results = []
-    parse_results = []
-    
     #with ThreadPoolExecutor(len(active_ports)) as executor:
     #        
     #        features = [executor.submit(comport.read_binr, port) for port in active_ports]
     #        for feature in as_completed(features):
     #            read_results.append(feature.result())
-    #
-    
-    #strat_time = time.time()
-    #for port in active_ports:
-    #    resp = comport.read_binr(port)
-    #    read_results.append(resp)
-#
-    #
-    #for result in read_results:
-    #    parse = comport.parse_binr(result)
-    #    parse_results.append(parse)
-    #
-    #for parse in parse_results:
-    #    comport.rendering(parse)
-    #end_time = time.time()
-    #res_time = end_time - strat_time   
-    #print(res_time)
-    #
+    # 
     def running():
-        strat_time = time.time()
-        for port in active_ports:
-            resp = comport.read_binr(port)
-            read_results.append(resp)
+        if comport.is_run:
+            strat_time = time.time()
+            read_results = [comport.read_binr(port) for port in active_ports]
+            parse_results = [comport.parse_binr(port) for port in read_results]
+            [comport.rendering(port) for port in parse_results]
 
+            end_time = time.time()
+            res_time = end_time - strat_time
+            print(res_time)
+            Tk.after(window, 100, running)
         
-        for result in read_results:
-            parse = comport.parse_binr(result)
-            parse_results.append(parse)
-        
-        for parse in parse_results:
-            comport.rendering(parse)
-        end_time = time.time()
-        res_time = end_time - strat_time
-        print(res_time)
-        Tk.after(window, 50, running)
-        
-    
     running()
+
+
+def stop():
+    comport.is_run = False
+    for port in comport.active_ports.copy():
+        port.write(comport.stop_request)
+        port.reset_input_buffer()
+        comport.active_ports.remove(port)
+        del port
+    
+    print('Stop')
 
 
 if __name__ == '__main__':
     comport = ParsingComports()
     
-
-
     Table(window, col=0, row=0, port='COM1')
     Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
     Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
@@ -229,10 +210,8 @@ if __name__ == '__main__':
     frame_stop = Frame(window, width=80, height=45, background='white')
     frame_stop.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='e')
     frame_stop.grid_propagate(False)
-    start = Button(frame_stop, text='Cтоп', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', highlightbackground='blue')
+    start = Button(frame_stop, text='Cтоп', font='Times 10 bold', borderwidth=2, background='#d9e2fc', width=10, height=2, fg='blue', command=stop)
     start.place(relx=0.5, rely=0.5, anchor='center')
-
-
 
     window.mainloop()
     
