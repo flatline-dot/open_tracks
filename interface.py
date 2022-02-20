@@ -6,13 +6,22 @@ window.wm_state('zoomed')
 window.title('review')
 window['background'] = 'white'
 
-NAME_W = int(window.winfo_screenwidth() / 18.8)
+NAME_W = int(window.winfo_screenwidth() / 19.2)
 TU_W = int(window.winfo_screenwidth() / 64)
-FACT_W = int(window.winfo_screenwidth() / 53.3)
-STATUS_W = int(window.winfo_screenwidth() / 40)
+FACT_W = int(window.winfo_screenwidth() / 47)
+STATUS_W = int(window.winfo_screenwidth() / 42)
 HEAD_H = int(window.winfo_screenheight() / 33.3)
 BODY_H = int(window.winfo_screenheight() / 49)
 PAD_X = (int(window.winfo_screenwidth() / 70), 0)
+
+if TU_W <= 25:
+    BODY_FONT = 'Times 7'
+    HEAD_FONT = 8
+
+else:
+    BODY_FONT = 'Times 8'
+    HEAD_FONT = 10
+
 
 
 class Table():
@@ -37,7 +46,7 @@ class Table():
                  'title_label', 'title', 'number'
                  )
 
-    def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font='Times 8', body_h=BODY_H):
+    def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
         Table.table_ports.append(self)
         self.number = port
         """Headers"""
@@ -50,50 +59,50 @@ class Table():
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
         frame_names.grid_propagate(False)
-        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font='Times 10 bold', background='#bbd0f2')
+        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font=f'Times {head_font} bold', background='#bbd0f2')
         label_names.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h, background='#bbd0f2')
         frame_const.grid(row=1 + row, column=1 + col)
         frame_const.grid_propagate(False)
-        label_const = Label(frame_const, text='ТУ', font='Times 10 bold', background='#bbd0f2')
+        label_const = Label(frame_const, text='ТУ', font=f'Times {head_font} bold', background='#bbd0f2')
         label_const.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h, background='#bbd0f2')
         frame_count.grid(row=1 + row, column=2 + col)
         frame_count.grid_propagate(False)
-        frame_count = Label(frame_count, text='Факт.', font='Times 9 bold', background='#bbd0f2')
+        frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
         frame_count.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
         frame_status.grid_propagate(False)
-        label_status = Label(frame_status, text='Cтатус', font='Times 9 bold', background='#bbd0f2')
+        label_status = Label(frame_status, text='Cтатус', font=f'Times {head_font - 1} bold', background='#bbd0f2')
         label_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OF"""
         frame_l1of = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
         frame_l1of.grid(row=2 + row, column=0 + col, padx=pad_x)
         frame_l1of.grid_propagate(False)
-        label_l1of = Label(frame_l1of, text='ГЛН L1OF', font=body_font)
+        label_l1of = Label(frame_l1of, text='ГЛН L1OF', font='Times 7')
         label_l1of.grid()
 
         l1of_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h)
         l1of_tu.grid(row=2 + row, column=1+col)
         l1of_tu.grid_propagate(False)
-        self.gln_l1of_tu = Label(l1of_tu, text='8', font=body_font)
+        self.gln_l1of_tu = Label(l1of_tu, text='8', font='Times 7')
         self.gln_l1of_tu.place(relx=0.5, rely=0.5, anchor='center')
 
         l1of_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h)
         l1of_fact.grid(row=2 + row, column=2 + col)
         l1of_fact.grid_propagate(False)
-        self.gln_l1of_fact = Label(l1of_fact, text='0', font=body_font)
+        self.gln_l1of_fact = Label(l1of_fact, text='0', font='Times 7')
         self.gln_l1of_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         self.gln_l1of_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1of_status_frame.grid(row=2 + row, column=3 + col)
         self.gln_l1of_status_frame.grid_propagate(False)
-        self.gln_l1of_status = Label(self.gln_l1of_status_frame, text='', font=body_font)
+        self.gln_l1of_status = Label(self.gln_l1of_status_frame, text='', font='Times 7')
         self.gln_l1of_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1SF"""

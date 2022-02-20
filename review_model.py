@@ -4,6 +4,7 @@ from serial.tools.list_ports import comports
 import time
 from interface import *
 
+
 class ParsingComports():
     def __init__(self):
         self.sputnik_values = {
@@ -31,11 +32,11 @@ class ParsingComports():
         self.request = bytearray([16, 57, 1, 16, 3])
         self.check_request = bytearray([16, 57, 16, 3])
         self.stop_request = bytearray([16, 14, 16, 3])
+        self.active_names = []
+        self.active_ports = []
         self.is_run = True
-            
 
     def check_connections(self):
-        self.active_names = []
         instance_ports = []
         access_ports = [i.device for i in comports()]
         print(access_ports)
@@ -68,8 +69,8 @@ class ParsingComports():
         print(self.active_names)
 
     def init_comports(self):
-        self.active_ports = []
-        if 'active_names' in self.__dict__:
+
+        if self.active_names:
             for name in self.active_names:
                 com = serial.Serial(port=name)
                 com.parity = serial.PARITY_ODD
@@ -93,18 +94,13 @@ class ParsingComports():
         return self.active_ports
 
     def read_binr(self, com):
-        #strat_time = time.time()
         response = b''
         while True:
             if com.in_waiting and com.in_waiting > 3:
-                start = time.time()
                 response += com.read(com.in_waiting)
 
                 if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
                     com.reset_input_buffer()
-                    #end_time = time.time()
-                    #res_time = end_time - strat_time
-                    #print(res_time)
                     return (com.port, response)
 
     def parse_binr(self, com_response):
@@ -143,22 +139,12 @@ def start():
     comport.is_run = True
     active_ports = comport.init_comports()
     [port.write(comport.request) for port in active_ports]
-    #with ThreadPoolExecutor(len(active_ports)) as executor:
-    #        
-    #        features = [executor.submit(comport.read_binr, port) for port in active_ports]
-    #        for feature in as_completed(features):
-    #            read_results.append(feature.result())
-    # 
+
     def running():
         if comport.is_run:
-            strat_time = time.time()
             read_results = [comport.read_binr(port) for port in active_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
-
-            end_time = time.time()
-            res_time = end_time - strat_time
-            print(res_time)
             Tk.after(window, 100, running)
         
     running()
