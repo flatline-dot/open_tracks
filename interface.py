@@ -1,15 +1,14 @@
-from tkinter import Tk, Frame, Label, Button
-
+from tkinter import Tk, Frame, Label
 
 window = Tk()
 window.wm_state('zoomed')
 window.title('review')
 window['background'] = 'white'
 
-NAME_W = int(window.winfo_screenwidth() / 19.2)
+NAME_W = int(window.winfo_screenwidth() / 19.7)
 TU_W = int(window.winfo_screenwidth() / 64)
 FACT_W = int(window.winfo_screenwidth() / 47)
-STATUS_W = int(window.winfo_screenwidth() / 42)
+STATUS_W = int(window.winfo_screenwidth() / 40)
 HEAD_H = int(window.winfo_screenheight() / 33.3)
 BODY_H = int(window.winfo_screenheight() / 49)
 PAD_X = (int(window.winfo_screenwidth() / 70), 0)
@@ -23,26 +22,25 @@ else:
     HEAD_FONT = 10
 
 
-
 class Table():
     table_ports = []
-    __slots__ = ('gln_l1of_tu', 'gln_l1of_fact', 'gln_l1of_status', 'gln_l1of_status_frame',
-                 'gln_l1sf_tu', 'gln_l1sf_fact', 'gln_l1sf_status', 'gln_l1sf_status_frame',
-                 'gln_l2of_tu', 'gln_l2of_fact', 'gln_l2of_status', 'gln_l2of_status_frame',
-                 'gln_l2sf_tu', 'gln_l2sf_fact', 'gln_l2sf_status', 'gln_l2sf_status_frame',
-                 'gln_l1oc_p_tu', 'gln_l1oc_p_fact', 'gln_l1oc_p_status', 'gln_l1oc_p_status_frame',
-                 'gln_l1oc_d_tu', 'gln_l1oc_d_fact', 'gln_l1oc_d_status', 'gln_l1oc_d_status_frame',
-                 'gln_l1sc_p_tu', 'gln_l1sc_p_fact', 'gln_l1sc_p_status', 'gln_l1sc_p_status_frame',
-                 'gln_l1sc_d_tu', 'gln_l1sc_d_fact', 'gln_l1sc_d_status', 'gln_l1sc_d_status_frame',
-                 'gln_l2oc_p_tu', 'gln_l2oc_p_fact', 'gln_l2oc_p_status', 'gln_l2oc_p_status_frame',
-                 'gln_l2oc_ksi_tu', 'gln_l2oc_ksi_fact', 'gln_l2oc_ksi_status', 'gln_l2oc_ksi_status_frame',
-                 'gln_l2sc_p_tu', 'gln_l2sc_p_fact', 'gln_l2sc_p_status', 'gln_l2sc_p_status_frame',
-                 'gln_l2sc_d_tu', 'gln_l2sc_d_fact', 'gln_l2sc_d_status', 'gln_l2sc_d_status_frame',
-                 'gps_l1_tu', 'gps_l1_fact', 'gps_l1_status', 'gps_l1_status_frame',
-                 'gps_l2_l_tu', 'gps_l2_l_fact', 'gps_l2_l_status', 'gps_l2_l_status_frame',
-                 'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status', 'gps_l2_m_status_frame',
-                 'sdkm_tu', 'sdkm_fact', 'sdkm_status', 'sdkm_status_frame',
-                 'sdps_tu', 'sdps_fact', 'sdps_status', 'sdps_status_frame',
+    __slots__ = ('gln_l1of_tu', 'gln_l1of_fact', 'gln_l1of_status_frame',
+                 'gln_l1sf_tu', 'gln_l1sf_fact', 'gln_l1sf_status_frame',
+                 'gln_l2of_tu', 'gln_l2of_fact', 'gln_l2of_status_frame',
+                 'gln_l2sf_tu', 'gln_l2sf_fact', 'gln_l2sf_status_frame',
+                 'gln_l1oc_p_tu', 'gln_l1oc_p_fact', 'gln_l1oc_p_status_frame',
+                 'gln_l1oc_d_tu', 'gln_l1oc_d_fact', 'gln_l1oc_d_status_frame',
+                 'gln_l1sc_p_tu', 'gln_l1sc_p_fact', 'gln_l1sc_p_status_frame',
+                 'gln_l1sc_d_tu', 'gln_l1sc_d_fact', 'gln_l1sc_d_status_frame',
+                 'gln_l2oc_p_tu', 'gln_l2oc_p_fact', 'gln_l2oc_p_status_frame',
+                 'gln_l2oc_ksi_tu', 'gln_l2oc_ksi_fact', 'gln_l2oc_ksi_status_frame',
+                 'gln_l2sc_p_tu', 'gln_l2sc_p_fact', 'gln_l2sc_p_status_frame',
+                 'gln_l2sc_d_tu', 'gln_l2sc_d_fact', 'gln_l2sc_d_status_frame',
+                 'gps_l1_tu', 'gps_l1_fact', 'gps_l1_status_frame',
+                 'gps_l2_l_tu', 'gps_l2_l_fact', 'gps_l2_l_status_frame',
+                 'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status_frame',
+                 'sdkm_tu', 'sdkm_fact', 'sdkm_status_frame',
+                 'sdps_tu', 'sdps_fact', 'sdps_status_frame',
                  'title_label', 'title', 'number'
                  )
 
@@ -102,8 +100,6 @@ class Table():
         self.gln_l1of_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1of_status_frame.grid(row=2 + row, column=3 + col)
         self.gln_l1of_status_frame.grid_propagate(False)
-        self.gln_l1of_status = Label(self.gln_l1of_status_frame, text='', font='Times 7')
-        self.gln_l1of_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1SF"""
         l1sf_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -127,8 +123,6 @@ class Table():
         self.gln_l1sf_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1sf_status_frame.grid(row=3 + row, column=3 + col)
         self.gln_l1sf_status_frame.grid_propagate(False)
-        self.gln_l1sf_status = Label(self.gln_l1sf_status_frame, text='', font=body_font)
-        self.gln_l1sf_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2OF"""
         l2of_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -152,8 +146,6 @@ class Table():
         self.gln_l2of_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2of_status_frame.grid(row=4 + row, column=3 + col)
         self.gln_l2of_status_frame.grid_propagate(False)
-        self.gln_l2of_status = Label(self.gln_l2of_status_frame, text='', font=body_font)
-        self.gln_l2of_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2SF"""
         l2sf_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -177,8 +169,6 @@ class Table():
         self.gln_l2sf_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2sf_status_frame.grid(row=5 + row, column=3 + col)
         self.gln_l2sf_status_frame.grid_propagate(False)
-        self.gln_l2sf_status = Label(self.gln_l2sf_status_frame, text='', font=body_font)
-        self.gln_l2sf_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OC"""
         l1oc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=body_h * 2)
@@ -209,8 +199,6 @@ class Table():
         self.gln_l1oc_p_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1oc_p_status_frame.grid(row=6 + row, column=3 + col, sticky='n')
         self.gln_l1oc_p_status_frame.grid_propagate(False)
-        self.gln_l1oc_p_status = Label(self.gln_l1oc_p_status_frame, text='', font=body_font)
-        self.gln_l1oc_p_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OCd"""
         l1oc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
@@ -234,8 +222,6 @@ class Table():
         self.gln_l1oc_d_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1oc_d_status_frame.grid(row=6 + row, column=3 + col, sticky='s')
         self.gln_l1oc_d_status_frame.grid_propagate(False)
-        self.gln_l1oc_d_status = Label(self.gln_l1oc_d_status_frame, text='', font=body_font)
-        self.gln_l1oc_d_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1SC"""
         l1sc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h *2))
@@ -266,8 +252,6 @@ class Table():
         self.gln_l1sc_p_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1sc_p_status_frame.grid(row=8 + row, column=3 + col, sticky='n')
         self.gln_l1sc_p_status_frame.grid_propagate(False)
-        self.gln_l1sc_p_status = Label(self.gln_l1sc_p_status_frame, text='', font=body_font)
-        self.gln_l1sc_p_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1SC_d"""
         l1sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
@@ -291,8 +275,6 @@ class Table():
         self.gln_l1sc_d_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l1sc_d_status_frame.grid(row=8 + row, column=3 + col, sticky='s')
         self.gln_l1sc_d_status_frame.grid_propagate(False)
-        self.gln_l1sc_d_status = Label(self.gln_l1sc_d_status_frame, text='', font=body_font)
-        self.gln_l1sc_d_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2OC"""
         l2oc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2))
@@ -323,15 +305,13 @@ class Table():
         self.gln_l2oc_p_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2oc_p_status_frame.grid(row=10 + row, column=3 + col, sticky='n')
         self.gln_l2oc_p_status_frame.grid_propagate(False)
-        self.gln_l2oc_p_status = Label(self.gln_l2oc_p_status_frame, text='', font=body_font)
-        self.gln_l2oc_p_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2OC_КСИ"""
         l2oc_ksi_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
         l2oc_ksi_title.grid(row=10 + row, column=0 + col, sticky='es')
         l2oc_ksi_title.grid_propagate(False)
         l2oc_ksi_label = Label(l2oc_ksi_title, text='КСИ', font=body_font)
-        l2oc_ksi_label.place(relx=0.5, rely=0.5, anchor='center')
+        l2oc_ksi_label.place(relx=0.4, rely=0.5, anchor='center')
 
         l2oc_ksi_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h)
         l2oc_ksi_tu.grid(row=10 + row, column=1 + col, sticky='s')
@@ -348,8 +328,6 @@ class Table():
         self.gln_l2oc_ksi_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2oc_ksi_status_frame.grid(row=10 + row, column=3 + col, sticky='s')
         self.gln_l2oc_ksi_status_frame.grid_propagate(False)
-        self.gln_l2oc_ksi_status = Label(self.gln_l2oc_ksi_status_frame, text='', font=body_font)
-        self.gln_l2oc_ksi_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2SC"""
         l2sc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2))
@@ -380,8 +358,6 @@ class Table():
         self.gln_l2sc_p_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2sc_p_status_frame.grid(row=12 + row, column=3 + col, sticky='n')
         self.gln_l2sc_p_status_frame.grid_propagate(False)
-        self.gln_l2sc_p_status = Label(self.gln_l2sc_p_status_frame, text='', font=body_font)
-        self.gln_l2sc_p_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L2SC_d"""
         l2sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
@@ -405,8 +381,6 @@ class Table():
         self.gln_l2sc_d_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gln_l2sc_d_status_frame.grid(row=12 + row, column=3 + col, sticky='s')
         self.gln_l2sc_d_status_frame.grid_propagate(False)
-        self.gln_l2sc_d_status = Label(self.gln_l2sc_d_status_frame, text='', font=body_font)
-        self.gln_l2sc_d_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GPS L1"""
         gps_l1_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -430,8 +404,6 @@ class Table():
         self.gps_l1_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gps_l1_status_frame.grid(row=13 + row, column=3 + col)
         self.gps_l1_status_frame.grid_propagate(False)
-        self.gps_l1_status = Label(self.gps_l1_status_frame, text='', font=body_font)
-        self.gps_l1_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GPS L2"""
         gps_l2_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2))
@@ -462,8 +434,6 @@ class Table():
         self.gps_l2_l_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gps_l2_l_status_frame.grid(row=14 + row, column=3 + col, sticky='n')
         self.gps_l2_l_status_frame.grid_propagate(False)
-        self.gps_l2_l_status = Label(self.gps_l2_l_status_frame, text='', font=body_font)
-        self.gps_l2_l_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GPS L2M"""
         gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
@@ -487,8 +457,6 @@ class Table():
         self.gps_l2_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.gps_l2_m_status_frame.grid(row=14 + row, column=3 + col, sticky='s')
         self.gps_l2_m_status_frame.grid_propagate(False)
-        self.gps_l2_m_status = Label(self.gps_l2_m_status_frame, text='', font=body_font)
-        self.gps_l2_m_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """СДКМ"""
         sdkm_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -512,8 +480,6 @@ class Table():
         self.sdkm_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.sdkm_status_frame.grid(row=15 + row, column=3 + col)
         self.sdkm_status_frame.grid_propagate(False)
-        self.sdkm_status = Label(self.sdkm_status_frame, text='', font=body_font)
-        self.sdkm_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """ШДПС"""
         sdps_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -537,8 +503,6 @@ class Table():
         self.sdps_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h)
         self.sdps_status_frame.grid(row=16 + row, column=3 + col)
         self.sdps_status_frame.grid_propagate(False)
-        self.sdps_status = Label(self.sdps_status_frame, text='', font=body_font)
-        self.sdps_status.place(relx=0.5, rely=0.5, anchor='center')
 
         pas_frame = Frame(window, height=20)
         pas_frame.grid(row=17)
