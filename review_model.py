@@ -53,7 +53,7 @@ class ParsingComports():
 
         sleep(1)
         for com in instance_ports:
-            if com.in_waiting:
+            if com.in_waiting and com.port not in self.active_names:
                 self.active_names.append(com.port)
                 com.reset_input_buffer()
 
@@ -158,6 +158,7 @@ def start():
 def stop():
     comport.is_run = False
     check_conection['state'] = 'normal'
+    comport.active_names.clear()
     for port in comport.active_ports.copy():
         port.write(comport.stop_request)
         port.reset_input_buffer()

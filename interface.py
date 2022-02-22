@@ -5,13 +5,13 @@ window.wm_state('zoomed')
 window.title('review')
 window['background'] = 'white'
 
-NAME_W = int(window.winfo_screenwidth() / 19.7)
-TU_W = int(window.winfo_screenwidth() / 64)
+NAME_W = int(window.winfo_screenwidth() / 17.5)
+TU_W = int(window.winfo_screenwidth() / 63.5)
 FACT_W = int(window.winfo_screenwidth() / 47)
 STATUS_W = int(window.winfo_screenwidth() / 40)
 HEAD_H = int(window.winfo_screenheight() / 33.3)
 BODY_H = int(window.winfo_screenheight() / 49)
-PAD_X = (int(window.winfo_screenwidth() / 70), 0)
+PAD_X = (int(window.winfo_screenwidth() / 150), 0)
 
 if TU_W <= 25:
     BODY_FONT = 'Times 7'
@@ -64,13 +64,13 @@ class Table():
         frame_const.grid(row=1 + row, column=1 + col)
         frame_const.grid_propagate(False)
         label_const = Label(frame_const, text='ТУ', font=f'Times {head_font} bold', background='#bbd0f2')
-        label_const.place(relx=0.5, rely=0.5, anchor='center')
+        label_const.place(relx=0.45, rely=0.5, anchor='center')
 
         frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h, background='#bbd0f2')
         frame_count.grid(row=1 + row, column=2 + col)
         frame_count.grid_propagate(False)
         frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
-        frame_count.place(relx=0.5, rely=0.5, anchor='center')
+        frame_count.place(relx=0.45, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
