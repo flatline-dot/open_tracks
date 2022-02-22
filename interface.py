@@ -7,8 +7,8 @@ window['background'] = 'white'
 
 NAME_W = int(window.winfo_screenwidth() / 17.5)
 TU_W = int(window.winfo_screenwidth() / 63.5)
-FACT_W = int(window.winfo_screenwidth() / 46)
-STATUS_W = int(window.winfo_screenwidth() / 40)
+FACT_W = int(window.winfo_screenwidth() / 42.5)
+STATUS_W = int(window.winfo_screenwidth() / 42)
 HEAD_H = int(window.winfo_screenheight() / 33.3)
 BODY_H = int(window.winfo_screenheight() / 47)
 PAD_X = (int(window.winfo_screenwidth() / 150), 0)
@@ -75,8 +75,8 @@ class Table():
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
         frame_status.grid_propagate(False)
-        label_status = Label(frame_status, text='Cтатус', font=f'Times {head_font - 1} bold', background='#bbd0f2')
-        label_status.place(relx=0.46, rely=0.5, anchor='center')
+        label_status = Label(frame_status, text='Реш.', font=f'Times {head_font - 1} bold', background='#bbd0f2')
+        label_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OF"""
         frame_l1of = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h)
@@ -175,7 +175,7 @@ class Table():
         l1oc_mix.grid(row=6 + row, column=0 + col, sticky='w', padx=pad_x)
         l1oc_mix.grid_propagate(False)
         l1oc_mix_label = Label(l1oc_mix, text='ГЛН L1OC', font=body_font)
-        l1oc_mix_label.place(rely=0.5, anchor='w')
+        l1oc_mix_label.place(relx=0, rely=0.5, anchor='w')
 
         """GLONASS L1OCp"""
         l1oc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h)
@@ -506,24 +506,3 @@ class Table():
 
         pas_frame = Frame(window, height=20)
         pas_frame.grid(row=17)
-
-
-Table(window, col=0, row=0, port='COM1')
-Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
-Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
-Table(window, col=12, row=0, port='COM4', pad_x=PAD_X)
-Table(window, col=16, row=0, port='COM5', pad_x=PAD_X)
-Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
-Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
-Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
-Table(window, col=0, row=19, port='COM9')
-Table(window, col=4, row=19, port='COM10', pad_x=PAD_X)
-Table(window, col=8, row=19, port='COM11', pad_x=PAD_X)
-Table(window, col=12, row=19, port='COM12', pad_x=PAD_X)
-Table(window, col=16, row=19, port='COM13', pad_x=PAD_X)
-Table(window, col=20, row=19, port='COM14', pad_x=PAD_X)
-Table(window, col=24, row=19, port='COM15', pad_x=PAD_X)
-Table(window, col=28, row=19, port='COM16', pad_x=PAD_X)
-
-
-window.mainloop()
