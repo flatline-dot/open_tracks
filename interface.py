@@ -311,7 +311,7 @@ class Table():
         l2oc_ksi_title.grid(row=10 + row, column=0 + col, sticky='es')
         l2oc_ksi_title.grid_propagate(False)
         l2oc_ksi_label = Label(l2oc_ksi_title, text='КСИ', font=body_font, background='#f5fcff')
-        l2oc_ksi_label.place(relx=0.45, rely=0.5, anchor='center')
+        l2oc_ksi_label.place(relx=0.4, rely=0.5, anchor='center')
 
         l2oc_ksi_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
         l2oc_ksi_tu.grid(row=10 + row, column=1 + col, sticky='s')
