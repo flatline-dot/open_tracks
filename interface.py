@@ -50,7 +50,7 @@ class Table():
         """Headers"""
         self.title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
         self.title.grid_propagate(False)
-        self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x)
+        self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x, pady=(5, 0))
         self.title_label = Label(self.title, text=port, font='Cambria 12 bold', background='#f5fcff')
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
@@ -70,7 +70,7 @@ class Table():
         frame_count.grid(row=1 + row, column=2 + col)
         frame_count.grid_propagate(False)
         frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
-        frame_count.place(relx=0.44, rely=0.5, anchor='center')
+        frame_count.place(relx=0.445, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
@@ -178,7 +178,7 @@ class Table():
         l1oc_mix_label.place(relx=0, rely=0.5, anchor='w')
 
         """GLONASS L1OCp"""
-        l1oc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l1oc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l1oc_p_title.grid(row=6 + row, column=0 + col, sticky='en')
         l1oc_p_title.grid_propagate(False)
         gln_l1oc_p = Label(l1oc_p_title, text='p', font=body_font, background='#f5fcff')
@@ -201,7 +201,7 @@ class Table():
         self.gln_l1oc_p_status_frame.grid_propagate(False)
 
         """GLONASS L1OCd"""
-        l1oc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l1oc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l1oc_d_title.grid(row=6 + row, column=0 + col, sticky='es')
         l1oc_d_title.grid_propagate(False)
         gln_l1oc_d = Label(l1oc_d_title, text='d', font=body_font, background='#f5fcff')
@@ -254,7 +254,7 @@ class Table():
         self.gln_l1sc_p_status_frame.grid_propagate(False)
 
         """GLONASS L1SC_d"""
-        l1sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l1sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l1sc_d_title.grid(row=8 + row, column=0 + col, sticky='es')
         l1sc_d_title.grid_propagate(False)
         gln_l1sc_d = Label(l1sc_d_title, text='d', font=body_font, background='#f5fcff')
@@ -284,7 +284,7 @@ class Table():
         l2oc_mix_label.place(rely=0.5, anchor='w')
 
         """GLONASS L2OC_p"""
-        l2oc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l2oc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l2oc_p_title.grid(row=10 + row, column=0 + col, sticky='en')
         l2oc_p_title.grid_propagate(False)
         l2oc_p_label = Label(l2oc_p_title, text='p', font=body_font, background='#f5fcff')
@@ -307,10 +307,10 @@ class Table():
         self.gln_l2oc_p_status_frame.grid_propagate(False)
 
         """GLONASS L2OC_КСИ"""
-        l2oc_ksi_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l2oc_ksi_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l2oc_ksi_title.grid(row=10 + row, column=0 + col, sticky='es')
         l2oc_ksi_title.grid_propagate(False)
-        l2oc_ksi_label = Label(l2oc_ksi_title, text='КСИ', font=body_font, background='#f5fcff')
+        l2oc_ksi_label = Label(l2oc_ksi_title, text='КСИ', font='Times 7', background='#f5fcff')
         l2oc_ksi_label.place(relx=0.4, rely=0.5, anchor='center')
 
         l2oc_ksi_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
@@ -337,7 +337,7 @@ class Table():
         l2sc_mix_label.place(rely=0.5, anchor='w')
 
         """GLONASS L2SC_p"""
-        l2sc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l2sc_p_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l2sc_p_title.grid(row=12 + row, column=0 + col, sticky='en')
         l2sc_p_title.grid_propagate(False)
         l2sc_p_label = Label(l2sc_p_title, text='p', font=body_font, background='#f5fcff')
@@ -360,7 +360,7 @@ class Table():
         self.gln_l2sc_p_status_frame.grid_propagate(False)
 
         """GLONASS L2SC_d"""
-        l2sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        l2sc_d_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         l2sc_d_title.grid(row=12 + row, column=0 + col, sticky='es')
         l2sc_d_title.grid_propagate(False)
         l2sc_d_label = Label(l2sc_d_title, text='d', font=body_font, background='#f5fcff')
@@ -413,7 +413,7 @@ class Table():
         gps_l2_mix_label.place(rely=0.5, anchor='w')
 
         """GPS L2L"""
-        gps_l2_l_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        gps_l2_l_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         gps_l2_l_title.grid(row=14 + row, column=0 + col, sticky='en')
         gps_l2_l_title.grid_propagate(False)
         gps_l2_l_label = Label(gps_l2_l_title, text='L', font=body_font, background='#f5fcff')
@@ -436,7 +436,7 @@ class Table():
         self.gps_l2_l_status_frame.grid_propagate(False)
 
         """GPS L2M"""
-        gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.3), height=body_h, background='#f5fcff')
+        gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
         gps_l2_m_title.grid(row=14 + row, column=0 + col, sticky='es')
         gps_l2_m_title.grid_propagate(False)
         gps_l2_m_label = Label(gps_l2_m_title, text='M', font=body_font, background='#f5fcff')
