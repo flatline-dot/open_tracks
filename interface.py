@@ -311,7 +311,7 @@ class Table():
         l2oc_ksi_title.grid(row=10 + row, column=0 + col, sticky='es')
         l2oc_ksi_title.grid_propagate(False)
         l2oc_ksi_label = Label(l2oc_ksi_title, text='КСИ', font='Times 7', background='#f5fcff')
-        l2oc_ksi_label.place(relx=0.4, rely=0.5, anchor='center')
+        l2oc_ksi_label.place(relx=0.403, rely=0.5, anchor='center')
 
         l2oc_ksi_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
         l2oc_ksi_tu.grid(row=10 + row, column=1 + col, sticky='s')
@@ -333,7 +333,7 @@ class Table():
         l2sc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2), background='#f5fcff')
         l2sc_mix.grid(row=12 + row, column=0 + col, sticky='w', padx=pad_x)
         l2sc_mix.grid_propagate(False)
-        l2sc_mix_label = Label(l2sc_mix, text='ГЛН L2OC', font=body_font, background='#f5fcff')
+        l2sc_mix_label = Label(l2sc_mix, text='ГЛН L2SC', font=body_font, background='#f5fcff')
         l2sc_mix_label.place(rely=0.5, anchor='w')
 
         """GLONASS L2SC_p"""

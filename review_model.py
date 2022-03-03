@@ -107,10 +107,13 @@ class ParsingComports():
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-            start = 2
+            system_index = 2
+            signal_index = 4
             for _ in range(96):
-                code_list.append(int(response_clear[start:start + 1].hex(), 16))
-                start += 20
+                if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
+                    code_list.append(int(response_clear[system_index:system_index + 1].hex(), 16))
+                system_index += 20
+                signal_index += 20
             count_results = {sputnik: code_list.count(self.sputnik_values[sputnik]) for sputnik in self.sputnik_values}
             return (com, count_results)
         return (com, None)
