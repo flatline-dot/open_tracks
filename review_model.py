@@ -107,10 +107,13 @@ class ParsingComports():
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-            start = 2
+            system_index = 2
+            signal_index = 4
             for _ in range(96):
-                code_list.append(int(response_clear[start:start + 1].hex(), 16))
-                start += 20
+                if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
+                    code_list.append(int(response_clear[system_index:system_index + 1].hex(), 16))
+                system_index += 20
+                signal_index += 20
             count_results = {sputnik: code_list.count(self.sputnik_values[sputnik]) for sputnik in self.sputnik_values}
             return (com, count_results)
         return (com, None)
@@ -141,6 +144,7 @@ class ParsingComports():
 
 def start():
     check_conection['state'] = 'disabled'
+    start['state'] = 'disabled'
     comport.is_run = True
     active_ports = comport.init_comports()
     [port.write(comport.request) for port in active_ports]
@@ -158,6 +162,7 @@ def start():
 def stop():
     comport.is_run = False
     check_conection['state'] = 'normal'
+    start['state'] = 'normal'
     comport.active_names.clear()
     for port in comport.active_ports.copy():
         port.write(comport.stop_request)
@@ -190,20 +195,20 @@ if __name__ == '__main__':
     frame_check = Frame(window, width=120, height=45, background='white')
     frame_check.grid(columnspan=4, column=11, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=2, background='#98d3ed', width=20, height=2, fg='black', command=comport.check_connections)
+    check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=2, fg='black', command=comport.check_connections)
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_start = Frame(window, width=80, height=45, background='white')
-    frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H)
+    frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='w')
     frame_start.grid_propagate(False)
-    start = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=2, background='#98d3ed', width=10, height=2, fg='black', command=start)
+    start = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=2, fg='black', command=start)
     start.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
-    frame_stop.grid(columnspan=3, column=18, row=37, pady=HEAD_H, sticky='we')
+    frame_stop.grid(columnspan=3, column=18, row=37, pady=HEAD_H, sticky='w')
     frame_stop.grid_propagate(False)
-    start = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=2, background='#98d3ed', state='normal', width=10, height=2, fg='black', command=stop)
-    start.place(relx=0.5, rely=0.5, anchor='center')
+    stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=2, fg='black', command=stop)
+    stop.place(relx=0.5, rely=0.5, anchor='center')
 
     window.mainloop()
     
