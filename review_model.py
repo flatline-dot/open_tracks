@@ -140,18 +140,21 @@ class ParsingComports():
                     table_port.title['background'] = '#ed1818'
                     table_port.title_label['background'] = '#ed1818'
                     break
+            for port in self.active_names:
+                if com == port.port:
+                    port.read(self.request)
 
 
 def start():
     check_conection['state'] = 'disabled'
     start['state'] = 'disabled'
     comport.is_run = True
-    active_ports = comport.init_comports()
-    [port.write(comport.request) for port in active_ports]
+    ready_ports = comport.init_comports()
+    [port.write(comport.request) for port in ready_ports]
 
     def running():
         if comport.is_run:
-            read_results = [comport.read_binr(port) for port in active_ports]
+            read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
             Tk.after(window, 100, running)
