@@ -94,12 +94,16 @@ class ParsingComports():
         while True:
             end_time = time()
             time_control = end_time - start_time
+            
             if time_control > 2:
                 return (com.port, None)
             if com.in_waiting and com.in_waiting > 3:
                 response += com.read(com.in_waiting)
                 if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
                     com.reset_input_buffer()
+                    #end = time()
+                    #red = end - start_time
+                    #print(red)
                     return (com.port, response)
 
     def parse_binr(self, com_response):
