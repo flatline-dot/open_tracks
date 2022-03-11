@@ -1,4 +1,4 @@
-from tkinter import Tk, Frame, Label
+from tkinter import Tk, Frame, Label, Button
 
 window = Tk()
 window.wm_state('zoomed')
@@ -24,6 +24,7 @@ else:
 
 class Table():
     table_ports = []
+    table_ports_dict = {}
     __slots__ = ('gln_l1of_tu', 'gln_l1of_fact', 'gln_l1of_status_frame',
                  'gln_l1sf_tu', 'gln_l1sf_fact', 'gln_l1sf_status_frame',
                  'gln_l2of_tu', 'gln_l2of_fact', 'gln_l2of_status_frame',
@@ -41,18 +42,23 @@ class Table():
                  'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status_frame',
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status_frame',
                  'sdps_tu', 'sdps_fact', 'sdps_status_frame',
-                 'title_label', 'title', 'number'
+                 'title_label', 'title', 'number', 'restart_status'
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
         Table.table_ports.append(self)
+        Table.table_ports_dict[port] = self
         self.number = port
+        self.restart_status = False
         """Headers"""
         self.title = Frame(window, borderwidth=1, relief='solid', width=name_w + tu_w + fact_w + status_w, height=30, background='white')
         self.title.grid_propagate(False)
         self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x, pady=(5, 0))
         self.title_label = Label(self.title, text=port, font='Cambria 12 bold', background='#f5fcff')
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
+        restart_button = Button(self.title, text='Restart', width=5, height=1, command=self.warm_restart)
+        restart_button.place(rely=0.5, anchor='w')
+
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
@@ -506,4 +512,6 @@ class Table():
 
         pas_frame = Frame(window, height=20)
         pas_frame.grid(row=17)
-
+    
+    def warm_restart(self):
+        self.restart_status = True

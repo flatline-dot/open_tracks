@@ -1,7 +1,7 @@
+from urllib import request
 from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
 from time import time, sleep
-from tkinter import Button
 from interface import *
 
 
@@ -32,6 +32,7 @@ class ParsingComports():
         self.request = bytearray([16, 57, 1, 16, 3])
         self.check_request = bytearray([16, 57, 16, 3])
         self.stop_request = bytearray([16, 14, 16, 3])
+        self.warm_restart = bytearray([16, 1, 0, 1, 33, 1, 0, 0, 16, 3])
         self.active_names = []
         self.active_ports = []
         self.is_run = True
@@ -76,6 +77,7 @@ class ParsingComports():
                 com.baudrate = 115200
                 com.bytesize = EIGHTBITS
                 com.timeout = 1
+                com.warm_request = False
                 self.active_ports.append(com)
         else:
             self.check_connections()
@@ -85,26 +87,30 @@ class ParsingComports():
                 com.baudrate = 115200
                 com.bytesize = EIGHTBITS
                 com.timeout = 1
+                com.warm_request = False
                 self.active_ports.append(com)
         return self.active_ports
 
     def read_binr(self, com):
         start_time = time()
         response = b''
-        while True:
-            end_time = time()
-            time_control = end_time - start_time
-            
-            if time_control > 2:
-                return (com.port, None)
-            if com.in_waiting and com.in_waiting > 3:
-                response += com.read(com.in_waiting)
-                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
-                    com.reset_input_buffer()
-                    #end = time()
-                    #red = end - start_time
-                    #print(red)
-                    return (com.port, response)
+        if not com.warm_request:
+            while True:
+                end_time = time()
+                time_control = end_time - start_time
+                
+                if time_control > 2:
+                    return (com.port, None)
+                if com.in_waiting and com.in_waiting > 3:
+                    response += com.read(com.in_waiting)
+                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
+                        com.reset_input_buffer()
+                        #end = time()
+                        #red = end - start_time
+                        #print(red)
+                        return (com, response)
+        else:
+            return (com, None)
 
     def parse_binr(self, com_response):
         com, response = com_response
@@ -125,28 +131,31 @@ class ParsingComports():
     def rendering(self, com_results):
         com, results = com_results
         if results:
-            for table_port in Table.table_ports:
-                if com == table_port.number:
-                    table_port.title['background'] = 'yellow'
-                    table_port.title_label['background'] = 'yellow'
-                    for result in results:
-                        fact = getattr(table_port, result + '_fact')
-                        fact['text'] = results[result]
-                        frame = getattr(table_port, result + '_status_frame')
-                        if int(getattr(table_port, result + '_tu')['text']) - int(fact['text']) <= 2 and int(fact['text']) != 0:
-                            frame['background'] = '#4fdb37'
-                        else:
-                            frame['background'] = '#fc4838'
-                    break
+            table_port = Table.table_ports_dict[com.port]
+            table_port.title['background'] = 'yellow'
+            table_port.title_label['background'] = 'yellow'
+            if table_port.restart_status:
+                com.write(self.warm_restart)
+                table_port.restart_status = False
+                com.write(self.request)
+                com.warm_request = True          
+            for result in results:
+                fact = getattr(table_port, result + '_fact')
+                fact['text'] = results[result]
+                frame = getattr(table_port, result + '_status_frame')
+                if int(getattr(table_port, result + '_tu')['text']) - int(fact['text']) <= 2 and int(fact['text']) != 0:
+                    frame['background'] = '#4fdb37'
+                else:
+                    frame['background'] = '#fc4838'
         else:
-            for table_port in Table.table_ports:
-                if com == table_port.number:
-                    table_port.title['background'] = '#ed1818'
-                    table_port.title_label['background'] = '#ed1818'
-                    break
-            for port in self.active_names:
-                if com == port.port:
-                    port.read(self.request)
+            #table_port = Table.table_ports_dict[com.port]
+            #table_port.title['background'] = '#ed1818'
+            #table_port.title_label['background'] = '#ed1818'
+            #com.write(self.request)
+            if com.in_waiting == 6:
+                com.reset_input_buffer()
+                com.write(self.request)
+                com.warm_request = False
 
 
 def start():
@@ -161,7 +170,7 @@ def start():
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
-            Tk.after(window, 100, running)
+            Tk.after(window, 500, running)
 
     running()
 
@@ -181,7 +190,6 @@ def stop():
 
 if __name__ == '__main__':
     comport = ParsingComports()
-    
     Table(window, col=0, row=0, port='COM1')
     Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
     Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
@@ -216,6 +224,5 @@ if __name__ == '__main__':
     frame_stop.grid_propagate(False)
     stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=2, fg='black', command=stop)
     stop.place(relx=0.5, rely=0.5, anchor='center')
-
     window.mainloop()
     
