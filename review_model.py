@@ -147,15 +147,19 @@ class ParsingComports():
                     frame['background'] = '#4fdb37'
                 else:
                     frame['background'] = '#fc4838'
-        else:
+        #else:
             #table_port = Table.table_ports_dict[com.port]
             #table_port.title['background'] = '#ed1818'
             #table_port.title_label['background'] = '#ed1818'
             #com.write(self.request)
-            if com.in_waiting == 6:
-                com.reset_input_buffer()
-                com.write(self.request)
-                com.warm_request = False
+            #if com.in_waiting == 6:
+            #    com.reset_input_buffer()
+            #    com.write(self.request)
+            #    com.warm_request = False
+
+        def all_warm_restart(self):
+            for table_port in Table.table_port:
+                table_port = True
 
 
 def start():
@@ -224,5 +228,12 @@ if __name__ == '__main__':
     frame_stop.grid_propagate(False)
     stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=2, fg='black', command=stop)
     stop.place(relx=0.5, rely=0.5, anchor='center')
+
+    frame_restart = Frame(window, width=120, height=45, background='white')
+    frame_restart.grid(columnspan=4, column=5, row=37, pady=HEAD_H, sticky='we')
+    frame_check.grid_propagate(False)
+    warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=2, fg='black', command=comport.all_warm_restart)
+    warm_restart.place(relx=0.5, rely=0.5, anchor='center')
+
     window.mainloop()
     
