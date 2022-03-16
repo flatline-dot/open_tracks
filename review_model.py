@@ -107,7 +107,7 @@ class ParsingComports():
                     response += com.read(com.in_waiting)
                     if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                         if self.response_21 in response or self.response_25 in response or self.response_27 in response:
-                            return (com, None)
+                            return (com, False)
                         com.reset_input_buffer()
                         return (com, response)
             else:
@@ -142,10 +142,10 @@ class ParsingComports():
 #
     def parse_binr(self, com_response):
         com, response = com_response
-        if response:
-            print(len(response))
-        else:
+        if response == False:
             print(response)
+        elif response:
+            print(len(response))
         
         if response:
             code_list = []
