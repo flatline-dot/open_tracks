@@ -65,10 +65,10 @@ class ParsingComports():
             i.__del__()       
         for port in Table.table_ports:
             if port.number in self.active_names:
-                port.title['background'] = 'yellow'
+                port.title_frame['background'] = 'yellow'
                 port.title_label['background'] = 'yellow'
             else:
-                port.title['background'] = 'white'
+                port.title_frame['background'] = 'white'
                 port.title_label['background'] = 'white'
         print(self.active_names)
 
@@ -151,15 +151,10 @@ class ParsingComports():
 
     def rendering(self, com_results):
         com, results = com_results
-        if results:
-            table_port = Table.table_ports_dict[com.port]
-            table_port.title['background'] = 'yellow'
+        table_port = Table.table_ports_dict[com.port]
+        if results:  
+            table_port.title_frame['background'] = 'yellow'
             table_port.title_label['background'] = 'yellow'
-            if table_port.restart_status:
-                com.write(self.warm_restart)
-                table_port.restart_status = False
-                com.write(self.request)
-                com.warm_request = True          
             for result in results:
                 fact = getattr(table_port, result + '_fact')
                 fact['text'] = results[result]
@@ -168,6 +163,30 @@ class ParsingComports():
                     frame['background'] = '#4fdb37'
                 else:
                     frame['background'] = '#fc4838'
+        if table_port.restart_status:
+            com.write(self.warm_restart)
+            table_port.restart_status = False
+            com.write(self.request)
+            com.warm_request = True
+            table_port.var_oc.set(0)
+            table_port.var_sc.set(0)
+            table_port.oc_complite = False
+            table_port.sc_complite = False
+
+        if table_port.var_oc.get() and not table_port.oc_complite:
+            com.write(self.param_21)
+            com.write(self.param_25)
+            table_port.oc_complite = True
+            com.reset_input_buffer()
+            com.write(self.request)
+
+        if table_port.var_sc.get() and not table_port.sc_complite:
+            com.write(self.param_27)
+            table_port.sc_complite = True
+            com.reset_input_buffer()
+            com.write(self.request)
+
+
         #else:
             #table_port = Table.table_ports_dict[com.port]
             #table_port.title['background'] = '#ed1818'
@@ -181,7 +200,10 @@ class ParsingComports():
     def all_warm_restart(self):
         for table_port in Table.table_ports:
             table_port.restart_status = True
-
+            table_port.var_oc.set(0)
+            table_port.var_sc.set(0)
+            table_port.oc_complite = False
+            table_port.sc_complite = False
 
 def start():
     check_conection['state'] = 'disabled'
@@ -193,13 +215,9 @@ def start():
     
     def running():
         if comport.is_run:
-            start_time = time()
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
-            end_time = time()
-            res = end_time - start_time
-            print(res)
             Tk.after(window, 100, running)
 
     running()
