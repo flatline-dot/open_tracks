@@ -37,6 +37,9 @@ class ParsingComports():
         self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
         self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
         self.response_restart = bytearray([16, 67, 5, 0, 16, 3])
+        self.response_21 = bytearray([16, 231, 21, 2, 16, 3])
+        self.response_25 = bytearray([16, 231, 25, 2, 16, 3])
+        self.response_27 = bytearray([16, 231, 27, 1, 16, 3])
         self.active_names = []
         self.active_ports = []
         self.is_run = True
@@ -103,11 +106,13 @@ class ParsingComports():
                 while True:
                     response += com.read(com.in_waiting)
                     if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                        if self.response_21 in response or self.response_25 in response or self.response_27 in response:
+                            return (com, None)
                         com.reset_input_buffer()
                         return (com, response)
             else:
                 return (com, None)
-        elif  self.response_restart in com.read(com.in_waiting):
+        elif self.response_restart in com.read(com.in_waiting):
             com.reset_input_buffer()
             com.write(self.request)
             com.warm_request = False
@@ -137,6 +142,11 @@ class ParsingComports():
 #
     def parse_binr(self, com_response):
         com, response = com_response
+        if response:
+            print(len(response))
+        else:
+            print(response)
+        
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -181,18 +191,10 @@ class ParsingComports():
             com.write(self.param_21)
             com.write(self.param_25)
             table_port.oc_complite = True
-            
-            sleep(0.1)
-            print(com.in_waiting)
-            com.reset_input_buffer()
-            com.write(self.request)
 
         if table_port.var_sc.get() and not table_port.sc_complite:
             com.write(self.param_27)
             table_port.sc_complite = True
-            com.reset_input_buffer()
-            com.write(self.request)
-
 
         #else:
             #table_port = Table.table_ports_dict[com.port]
