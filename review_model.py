@@ -36,6 +36,7 @@ class ParsingComports():
         self.param_21 = bytearray([16, 215, 21, 2, 16, 3])
         self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
         self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
+        self.response_restart = bytearray([16, 67, 5, 0, 16, 3])
         self.active_names = []
         self.active_ports = []
         self.is_run = True
@@ -95,6 +96,7 @@ class ParsingComports():
         return self.active_ports
 
     def read_binr(self, com):
+        #print(com.in_waiting)
         response = b''
         if not com.warm_request: 
             if com.in_waiting >= 1924:
@@ -105,7 +107,7 @@ class ParsingComports():
                         return (com, response)
             else:
                 return (com, None)
-        elif com.in_waiting == 6:
+        elif  self.response_restart in com.read(com.in_waiting):
             com.reset_input_buffer()
             com.write(self.request)
             com.warm_request = False
@@ -165,19 +167,23 @@ class ParsingComports():
                     frame['background'] = '#fc4838'
         if table_port.restart_status:
             com.write(self.stop_request)
-            com.reset_input_buffer()
-            com.write(self.warm_restart)
+            
             table_port.restart_status = False
             com.warm_request = True
             table_port.var_oc.set(0)
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
+            com.reset_input_buffer()
+            com.write(self.warm_restart)
 
         if table_port.var_oc.get() and not table_port.oc_complite:
             com.write(self.param_21)
             com.write(self.param_25)
             table_port.oc_complite = True
+            
+            sleep(0.1)
+            print(com.in_waiting)
             com.reset_input_buffer()
             com.write(self.request)
 
