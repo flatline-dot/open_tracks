@@ -33,6 +33,9 @@ class ParsingComports():
         self.check_request = bytearray([16, 57, 16, 3])
         self.stop_request = bytearray([16, 14, 16, 3])
         self.warm_restart = bytearray([16, 1, 0, 1, 33, 1, 0, 0, 16, 3])
+        self.param_21 = bytearray([16, 215, 21, 2, 16, 3])
+        self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
+        self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
         self.active_names = []
         self.active_ports = []
         self.is_run = True
@@ -92,26 +95,44 @@ class ParsingComports():
         return self.active_ports
 
     def read_binr(self, com):
-        start_time = time()
         response = b''
-        if not com.warm_request:
-            while True:
-                end_time = time()
-                time_control = end_time - start_time
-                
-                if time_control > 2:
-                    return (com.port, None)
-                if com.in_waiting and com.in_waiting > 3:
+        if not com.warm_request: 
+            if com.in_waiting >= 1924:
+                while True:
                     response += com.read(com.in_waiting)
-                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
+                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                         com.reset_input_buffer()
-                        #end = time()
-                        #red = end - start_time
-                        #print(red)
                         return (com, response)
+            else:
+                return (com, None)
+        elif com.in_waiting == 6:
+            com.reset_input_buffer()
+            com.write(self.request)
+            com.warm_request = False
+            return (com, None)
         else:
             return (com, None)
-
+#    def read_binr(self, com):
+#        start_time = time()
+#        response = b''
+#        if not com.warm_request:
+#            while True:
+#                end_time = time()
+#                time_control = end_time - start_time
+#                
+#                if time_control > 2:
+#                    return (com.port, None)
+#                if com.in_waiting and com.in_waiting > 3:
+#                    response += com.read(com.in_waiting)
+#                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
+#                        com.reset_input_buffer()
+#                        #end = time()
+#                        #red = end - start_time
+#                        #print(red)
+#                        return (com, response)
+#        else:
+#            return (com, None)
+#
     def parse_binr(self, com_response):
         com, response = com_response
         if response:
@@ -157,9 +178,9 @@ class ParsingComports():
             #    com.write(self.request)
             #    com.warm_request = False
 
-        def all_warm_restart(self):
-            for table_port in Table.table_port:
-                table_port = True
+    def all_warm_restart(self):
+        for table_port in Table.table_ports:
+            table_port.restart_status = True
 
 
 def start():
@@ -168,13 +189,18 @@ def start():
     comport.is_run = True
     ready_ports = comport.init_comports()
     [port.write(comport.request) for port in ready_ports]
-
+    sleep(1)
+    
     def running():
         if comport.is_run:
+            start_time = time()
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
-            Tk.after(window, 500, running)
+            end_time = time()
+            res = end_time - start_time
+            print(res)
+            Tk.after(window, 100, running)
 
     running()
 
