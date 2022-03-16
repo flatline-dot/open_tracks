@@ -164,9 +164,10 @@ class ParsingComports():
                 else:
                     frame['background'] = '#fc4838'
         if table_port.restart_status:
+            com.write(self.stop_request)
+            com.reset_input_buffer()
             com.write(self.warm_restart)
             table_port.restart_status = False
-            com.write(self.request)
             com.warm_request = True
             table_port.var_oc.set(0)
             table_port.var_sc.set(0)
