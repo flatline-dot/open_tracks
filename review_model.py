@@ -214,6 +214,17 @@ class ParsingComports():
             table_port.oc_complite = False
             table_port.sc_complite = False
 
+    def set_oc(self):
+        for port in self.active_ports:
+            table_port = Table.table_ports_dict[port.port]
+            table_port.var_oc.set(1)
+
+    def set_sc(self):
+        for port in self.active_ports:
+            table_port = Table.table_ports_dict[port.port]
+            table_port.var_sc.set(1)
+
+
 def start():
     check_conection['state'] = 'disabled'
     start['state'] = 'disabled'
@@ -267,26 +278,33 @@ if __name__ == '__main__':
     frame_check = Frame(window, width=120, height=45, background='white')
     frame_check.grid(columnspan=4, column=11, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=2, fg='black', command=comport.check_connections)
+    check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.check_connections)
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_start = Frame(window, width=80, height=45, background='white')
     frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='w')
     frame_start.grid_propagate(False)
-    start = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=2, fg='black', command=start)
+    start = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=start)
     start.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
     frame_stop.grid(columnspan=3, column=18, row=37, pady=HEAD_H, sticky='w')
     frame_stop.grid_propagate(False)
-    stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=2, fg='black', command=stop)
+    stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
     stop.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_restart = Frame(window, width=120, height=45, background='white')
     frame_restart.grid(columnspan=4, column=5, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=2, fg='black', command=comport.all_warm_restart)
+    warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
     warm_restart.place(relx=0.5, rely=0.5, anchor='center')
 
+    oc_variable = IntVar()
+    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white')
+    oc_checkbok.grid(column=4, row=37)
+
+    sc_variable = IntVar()
+    sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_variable, command=comport.set_sc, background='white')
+    sc_checkbok.grid(column=3, columnspan=2, row=37, sticky='w')
     window.mainloop()
     
