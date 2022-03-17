@@ -37,6 +37,7 @@ class ParsingComports():
         self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
         self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
         self.response_restart = bytearray([16, 67, 5, 0, 16, 3])
+        self.response_restart_2 = bytearray([16, 67, 5, 1, 16, 3]) 
         self.response_21 = bytearray([16, 231, 21, 2, 16, 3])
         self.response_25 = bytearray([16, 231, 25, 2, 16, 3])
         self.response_27 = bytearray([16, 231, 27, 1, 16, 3])
@@ -99,7 +100,9 @@ class ParsingComports():
         return self.active_ports
 
     def read_binr(self, com):
-        #print(com.in_waiting)
+        if com.port == 'COM4':
+            print(com.in_waiting)
+
         response = b''
         if not com.warm_request: 
             if com.in_waiting >= 1924:
@@ -108,11 +111,13 @@ class ParsingComports():
                     if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                         if self.response_21 in response or self.response_25 in response or self.response_27 in response:
                             return (com, False)
+                        #if self.response_restart in response:
+                        #    return (com, False)
                         com.reset_input_buffer()
                         return (com, response)
             else:
                 return (com, None)
-        elif self.response_restart in com.read(com.in_waiting):
+        elif com.in_waiting == 6:
             com.reset_input_buffer()
             com.write(self.request)
             com.warm_request = False
@@ -142,11 +147,11 @@ class ParsingComports():
 #
     def parse_binr(self, com_response):
         com, response = com_response
-        if response == False:
-            print(response)
-        elif response:
-            print(len(response))
-        
+        #if response == False:
+        #    print(response)
+        #elif response:
+        #    print(len(response))
+        #
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -177,7 +182,7 @@ class ParsingComports():
                     frame['background'] = '#fc4838'
         if table_port.restart_status:
             com.write(self.stop_request)
-            
+            sleep(0.5)
             table_port.restart_status = False
             com.warm_request = True
             table_port.var_oc.set(0)
@@ -186,6 +191,7 @@ class ParsingComports():
             table_port.sc_complite = False
             com.reset_input_buffer()
             com.write(self.warm_restart)
+            
 
         if table_port.var_oc.get() and not table_port.oc_complite:
             com.write(self.param_21)
@@ -297,7 +303,7 @@ if __name__ == '__main__':
     frame_restart.grid(columnspan=4, column=5, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
-    warm_restart.place(relx=0.5, rely=0.5, anchor='centre')
+    warm_restart.place(relx=0.5, rely=0.5, anchor='center')
 
     oc_variable = IntVar()
     oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white')
