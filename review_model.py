@@ -111,17 +111,17 @@ class ParsingComports():
                     if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                         if self.response_21 in response or self.response_25 in response or self.response_27 in response:
                             return (com, False)
-                        #if self.response_restart in response:
-                        #    return (com, False)
                         com.reset_input_buffer()
                         return (com, response)
             else:
                 return (com, None)
-        elif com.in_waiting == 6:
-            com.reset_input_buffer()
-            com.write(self.request)
-            com.warm_request = False
-            return (com, None)
+        elif com.warm_request:
+            response = com.read(com.in_waiting)
+            if self.response_restart in response or self.response_restart_2 in response:
+                com.reset_input_buffer()
+                com.write(self.request)
+                com.warm_request = False
+                return (com, None)
         else:
             return (com, None)
 #    def read_binr(self, com):
@@ -147,11 +147,6 @@ class ParsingComports():
 #
     def parse_binr(self, com_response):
         com, response = com_response
-        #if response == False:
-        #    print(response)
-        #elif response:
-        #    print(len(response))
-        #
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -181,17 +176,16 @@ class ParsingComports():
                 else:
                     frame['background'] = '#fc4838'
         if table_port.restart_status:
-            com.write(self.stop_request)
-            sleep(0.5)
+            com.write(self.warm_restart)
             table_port.restart_status = False
+            table_port.restart_button['state'] = 'disabled'
             com.warm_request = True
             table_port.var_oc.set(0)
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
-            com.reset_input_buffer()
-            com.write(self.warm_restart)
-            
+        else:
+            table_port.restart_button['state'] = 'normal'
 
         if table_port.var_oc.get() and not table_port.oc_complite:
             com.write(self.param_21)
@@ -213,6 +207,8 @@ class ParsingComports():
             #    com.warm_request = False
 
     def all_warm_restart(self):
+        oc_variable.set(0)
+        sc_variable.set(0)
         for table_port in Table.table_ports:
             table_port.restart_status = True
             table_port.var_oc.set(0)
@@ -244,6 +240,11 @@ def start():
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
+            restart_list = [port.warm_request for port in comport.active_ports]
+            if True in restart_list:
+                warm_restart['state'] = 'disabled'
+            else:
+                warm_restart['state'] = 'normal'
             Tk.after(window, 100, running)
 
     running()

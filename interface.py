@@ -43,7 +43,8 @@ class Table():
                  'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status_frame',
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status_frame',
                  'sdps_tu', 'sdps_fact', 'sdps_status_frame',
-                 'title_label', 'title', 'number', 'restart_status', 'var_oc', 'var_sc', 'oc_complite', 'sc_complite', 'title_frame'
+                 'title_label', 'title', 'number', 'restart_status', 'var_oc', 'var_sc',
+                 'oc_complite', 'sc_complite', 'title_frame', 'restart_button'
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
@@ -67,8 +68,8 @@ class Table():
         self.title_label = Label(self.title_frame, text=port, font='Cambria 11 bold', background='white')
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
-        restart_button = Button(self.title, text='Restart', borderwidth=2, font='Cambria 8 bold', width=6, command=self.warm_restart, background='silver')
-        restart_button.place(rely=0.5, relx=0.5, anchor='center')
+        self.restart_button = Button(self.title, text='Restart', borderwidth=2, font='Cambria 8 bold', width=6, command=self.warm_restart, background='silver')
+        self.restart_button.place(rely=0.5, relx=0.5, anchor='center')
 
         oc_checkbox = Checkbutton(self.title, text='OC', font='Cambria 10 bold',  variable=self.var_oc, background='white')
         oc_checkbox.place(relx=0.9, rely=0.5, anchor='center')
