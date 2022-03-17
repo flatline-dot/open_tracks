@@ -297,7 +297,7 @@ if __name__ == '__main__':
     frame_restart.grid(columnspan=4, column=5, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
-    warm_restart.place(relx=0.5, rely=0.5, anchor='center')
+    warm_restart.place(relx=0.5, rely=0.5, anchor='centre')
 
     oc_variable = IntVar()
     oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white')

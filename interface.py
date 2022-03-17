@@ -68,13 +68,13 @@ class Table():
         self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
         restart_button = Button(self.title, text='Restart', borderwidth=2, font='Cambria 8 bold', width=6, command=self.warm_restart, background='silver')
-        restart_button.place(rely=0.4, relx=0.5, anchor='center')
+        restart_button.place(rely=0.5, relx=0.5, anchor='center')
 
         oc_checkbox = Checkbutton(self.title, text='OC', font='Cambria 10 bold',  variable=self.var_oc, background='white')
-        oc_checkbox.place(relx=0.85, rely=0.5, anchor='center')
+        oc_checkbox.place(relx=0.9, rely=0.5, anchor='center')
 
         sc_checkbox = Checkbutton(self.title, text='SC', font='Cambria 10 bold', variable=self.var_sc, background='white')
-        sc_checkbox.place(relx=0.6, rely=0.5, anchor='center')
+        sc_checkbox.place(relx=0.7, rely=0.5, anchor='center')
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
