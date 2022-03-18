@@ -100,53 +100,30 @@ class ParsingComports():
         return self.active_ports
 
     def read_binr(self, com):
-        if com.port == 'COM4':
-            print(com.in_waiting)
-
         response = b''
         if not com.warm_request: 
             if com.in_waiting >= 1924:
                 while True:
                     response += com.read(com.in_waiting)
                     if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
-                        if self.response_21 in response or self.response_25 in response or self.response_27 in response:
+                        if self.response_21 in response or self.response_25 in response or self.response_27 in response or self.response_restart in response or self.response_restart_2 in response:
                             return (com, False)
                         com.reset_input_buffer()
                         return (com, response)
             else:
                 return (com, None)
         elif com.warm_request:
-            response = com.read(com.in_waiting)
-            if self.response_restart in response or self.response_restart_2 in response:
-                com.reset_input_buffer()
-                com.write(self.request)
-                com.warm_request = False
-                return (com, None)
+            sleep(3)
+            com.write(self.request)
+            com.warm_request = False
+            return (com, None)
         else:
             return (com, None)
-#    def read_binr(self, com):
-#        start_time = time()
-#        response = b''
-#        if not com.warm_request:
-#            while True:
-#                end_time = time()
-#                time_control = end_time - start_time
-#                
-#                if time_control > 2:
-#                    return (com.port, None)
-#                if com.in_waiting and com.in_waiting > 3:
-#                    response += com.read(com.in_waiting)
-#                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16) and (len(response) >= 1924):
-#                        com.reset_input_buffer()
-#                        #end = time()
-#                        #red = end - start_time
-#                        #print(red)
-#                        return (com, response)
-#        else:
-#            return (com, None)
-#
+
     def parse_binr(self, com_response):
         com, response = com_response
+        if response == False:
+            print(response)
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -164,6 +141,7 @@ class ParsingComports():
     def rendering(self, com_results):
         com, results = com_results
         table_port = Table.table_ports_dict[com.port]
+        
         if results:  
             table_port.title_frame['background'] = 'yellow'
             table_port.title_label['background'] = 'yellow'
@@ -176,6 +154,7 @@ class ParsingComports():
                 else:
                     frame['background'] = '#fc4838'
         if table_port.restart_status:
+            com.write(self.stop_request)
             com.write(self.warm_restart)
             table_port.restart_status = False
             table_port.restart_button['state'] = 'disabled'
@@ -196,26 +175,21 @@ class ParsingComports():
             com.write(self.param_27)
             table_port.sc_complite = True
 
-        #else:
-            #table_port = Table.table_ports_dict[com.port]
-            #table_port.title['background'] = '#ed1818'
-            #table_port.title_label['background'] = '#ed1818'
-            #com.write(self.request)
-            #if com.in_waiting == 6:
-            #    com.reset_input_buffer()
-            #    com.write(self.request)
-            #    com.warm_request = False
-
     def all_warm_restart(self):
         oc_variable.set(0)
         sc_variable.set(0)
         for table_port in Table.table_ports:
-            table_port.restart_status = True
             table_port.var_oc.set(0)
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
 
+        for com in self.active_ports:
+            com.write(self.warm_restart)
+        sleep(3)
+        for com in self.active_ports:
+            com.write(self.request)
+    
     def set_oc(self):
         for port in self.active_ports:
             table_port = Table.table_ports_dict[port.port]
@@ -234,7 +208,6 @@ def start():
     ready_ports = comport.init_comports()
     [port.write(comport.request) for port in ready_ports]
     sleep(1)
-    
     def running():
         if comport.is_run:
             read_results = [comport.read_binr(port) for port in ready_ports]
