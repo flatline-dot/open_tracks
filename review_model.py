@@ -1,5 +1,3 @@
-from os import times_result
-from urllib import request
 from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
 from time import time, sleep
@@ -11,7 +9,7 @@ class ParsingComports():
         self.sputnik_values = {
 
                                 'gln_l1of': 2,
-                                'gln_l1sf': 5 ,
+                                'gln_l1sf': 5,
                                 'gln_l2of': 3,
                                 'gln_l2sf': 6,
                                 'gln_l1oc_p': 101,
@@ -205,8 +203,6 @@ class ParsingComports():
             table_port = Table.table_ports_dict[port.port]
             table_port.var_sc.set(1)
 
-
-    
     def read_binr_vector(self, com):
         response = b'' 
         if com.in_waiting >= 74:
@@ -283,8 +279,8 @@ def start_vector():
     ready_ports = comport.init_comports()
     [port.write(comport.vector_request) for port in ready_ports]
     timer_start = time()
-    def running():
 
+    def running():
         if comport.is_run:
             timer_continue = time()
             timer_result = timer_continue - timer_start + 1
@@ -296,7 +292,6 @@ def start_vector():
                 [comport.rendering_vector(port) for port in parse_results]
                 timer['text'] = f'Total time: {int(timer_result)} c'
                 Tk.after(window, 100, running)
-
     running()
 
 
@@ -359,7 +354,7 @@ if __name__ == '__main__':
     warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
     oc_variable = IntVar()
-    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white')
+    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white', borderwidth=1)
     oc_checkbok.grid(column=4, row=37)
 
     sc_variable = IntVar()
@@ -375,8 +370,7 @@ if __name__ == '__main__':
     timer_frame = Frame(window, width=120, height=45, background='white')
     timer_frame.grid(columnspan=3, column=25, row=37)
     timer_frame.grid_propagate(False)
-    timer = Label(timer_frame, text='', font='Arial 12', background='white')
+    timer = Label(timer_frame, text='', font='Arial 14', background='white')
     timer.place(relx=0.5, rely=0.5, anchor='center')
 
     window.mainloop()
-    
