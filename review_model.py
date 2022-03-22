@@ -201,6 +201,17 @@ class ParsingComports():
             table_port.var_sc.set(1)
 
 
+    
+    def read_binr_vector(self):
+        pass
+
+    def parse_binr_vector(self):
+        pass
+
+    def rendering_vector(self):
+        pass
+
+
 def start():
     check_conection['state'] = 'disabled'
     start['state'] = 'disabled'
@@ -222,6 +233,28 @@ def start():
 
     running()
 
+
+def start_vector():
+    check_conection['state'] = 'disabled'
+    start['state'] = 'disabled'
+    comport.is_run = True
+    ready_ports = comport.init_comports()
+    [port.write(comport.request_vector) for port in ready_ports]
+    sleep(1)
+    timer_start = time()
+    def running():
+        timer_continue = time()
+        timer_result = timer_continue - timer_start
+        if int(timer_result) >= 36:
+            stop()                
+        else:
+            read_results = [comport.read_binr_vector(port) for port in ready_ports]
+            parse_results = [comport.parse_binr_vector(port) for port in read_results]
+            [comport.rendering_vector(port) for port in parse_results]
+            Tk.after(window, 100, running)
+
+    if comport.is_run:
+        running()
 
 def stop():
     comport.is_run = False
@@ -256,7 +289,7 @@ if __name__ == '__main__':
     Table(window, col=28, row=19, port='COM16', pad_x=PAD_X)
 
     frame_check = Frame(window, width=120, height=45, background='white')
-    frame_check.grid(columnspan=4, column=11, row=37, pady=HEAD_H, sticky='we')
+    frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.check_connections)
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
@@ -268,13 +301,13 @@ if __name__ == '__main__':
     start.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
-    frame_stop.grid(columnspan=3, column=18, row=37, pady=HEAD_H, sticky='w')
+    frame_stop.grid(columnspan=3, column=23, row=37, pady=HEAD_H, sticky='w')
     frame_stop.grid_propagate(False)
     stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
     stop.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_restart = Frame(window, width=120, height=45, background='white')
-    frame_restart.grid(columnspan=4, column=5, row=37, pady=HEAD_H, sticky='we')
+    frame_restart.grid(columnspan=4, column=6, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
     warm_restart.place(relx=0.5, rely=0.5, anchor='center')
@@ -286,5 +319,18 @@ if __name__ == '__main__':
     sc_variable = IntVar()
     sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_variable, command=comport.set_sc, background='white')
     sc_checkbok.grid(column=3, columnspan=2, row=37, sticky='w')
+
+    verctor_frame = Frame(window, width=120, height=45, background='white')
+    verctor_frame.grid(columnspan=4, column=17, row=37, pady=HEAD_H, sticky='we')
+    frame_stop.grid_propagate(False)
+    vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=start_vector)
+    vector_button.place(relx=0.5, rely=0.5, anchor='center')
+
+    timer_frame = Frame(window, width=80, height=45, background='white')
+    timer_frame.grid(columnspan=3, column=25, row=37)
+    timer_frame.grid_propagate(False)
+    timer = Label(timer_frame, text='1', font='Arial 12', background='white')
+    timer.grid()
+
     window.mainloop()
     
