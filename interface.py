@@ -44,7 +44,8 @@ class Table():
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status_frame',
                  'sdps_tu', 'sdps_fact', 'sdps_status_frame',
                  'title_label', 'title', 'number', 'restart_status', 'var_oc', 'var_sc',
-                 'oc_complite', 'sc_complite', 'title_frame', 'restart_button'
+                 'oc_complite', 'sc_complite', 'title_frame', 'restart_button', 'vector_frame',
+                 'vector_label',
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
@@ -77,25 +78,25 @@ class Table():
         sc_checkbox = Checkbutton(self.title, text='SC', font='Cambria 10 bold', variable=self.var_sc, background='white')
         sc_checkbox.place(relx=0.7, rely=0.5, anchor='center')
 
-        frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h, background='#bbd0f2')
+        frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
         frame_names.grid_propagate(False)
         label_names = Label(frame_names, text='Диапозон', borderwidth=1, font=f'Times {head_font} bold', background='#bbd0f2')
         label_names.place(relx=0.5, rely=0.5, anchor='center')
 
-        frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h, background='#bbd0f2')
+        frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h - 7, background='#bbd0f2')
         frame_const.grid(row=1 + row, column=1 + col)
         frame_const.grid_propagate(False)
         label_const = Label(frame_const, text='ТУ', font=f'Times {head_font} bold', background='#bbd0f2')
         label_const.place(relx=0.45, rely=0.5, anchor='center')
 
-        frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h, background='#bbd0f2')
+        frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h - 7, background='#bbd0f2')
         frame_count.grid(row=1 + row, column=2 + col)
         frame_count.grid_propagate(False)
         frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
         frame_count.place(relx=0.445, rely=0.5, anchor='center')
 
-        frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h, background='#bbd0f2')
+        frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h - 7, background='#bbd0f2')
         frame_status.grid(row=1 + row, column=3 + col)
         frame_status.grid_propagate(False)
         label_status = Label(frame_status, text='Реш.', font=f'Times {head_font - 1} bold', background='#bbd0f2')
@@ -527,8 +528,17 @@ class Table():
         self.sdps_status_frame.grid(row=16 + row, column=3 + col)
         self.sdps_status_frame.grid_propagate(False)
 
+        self.vector_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
+        self.vector_frame.grid_propagate(False)
+        self.vector_frame.grid(row=17 + row, column=col, columnspan=4, padx=pad_x)
+
+        self.vector_label = Label(self.vector_frame, text='Вектор состояния', font=body_font, background='#f5fcff')
+        self.vector_label.place(relx=0.5, rely=0.5, anchor='center')
+
         pas_frame = Frame(window, height=10)
-        pas_frame.grid(row=17)
+        pas_frame.grid(row=18)
+
+
     
     def warm_restart(self):
         self.restart_status = True

@@ -1,3 +1,4 @@
+from os import times_result
 from urllib import request
 from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
@@ -36,6 +37,7 @@ class ParsingComports():
         self.param_21 = bytearray([16, 215, 21, 2, 16, 3])
         self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
         self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
+        self.vector_request = bytearray([16, 39, 1, 16, 3])
         self.response_restart = bytearray([16, 67, 5, 0, 16, 3])
         self.response_restart_2 = bytearray([16, 67, 5, 1, 16, 3]) 
         self.response_21 = bytearray([16, 231, 21, 2, 16, 3])
@@ -86,6 +88,7 @@ class ParsingComports():
                 com.bytesize = EIGHTBITS
                 com.timeout = 1
                 com.warm_request = False
+                com.vector_status = False
                 self.active_ports.append(com)
         else:
             self.check_connections()
@@ -96,6 +99,7 @@ class ParsingComports():
                 com.bytesize = EIGHTBITS
                 com.timeout = 1
                 com.warm_request = False
+                com.vector_status = False
                 self.active_ports.append(com)
         return self.active_ports
 
@@ -186,10 +190,11 @@ class ParsingComports():
 
         for com in self.active_ports:
             com.write(self.warm_restart)
+        
         sleep(3)
         for com in self.active_ports:
             com.write(self.request)
-    
+
     def set_oc(self):
         for port in self.active_ports:
             table_port = Table.table_ports_dict[port.port]
@@ -202,33 +207,68 @@ class ParsingComports():
 
 
     
-    def read_binr_vector(self):
-        pass
+    def read_binr_vector(self, com):
+        response = b'' 
+        if com.in_waiting >= 74:
+                response += com.read(com.in_waiting)
+                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                    com.reset_input_buffer()
+                    return (com, response)
+                else:
+                    return (com, None)    
+        else:
+            return (com, None)
 
-    def parse_binr_vector(self):
-        pass
+    def parse_binr_vector(self, com_response):
+        com, response = com_response
+        vector_status = False
+        if response:
+            response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+            vector_status = int(response_clear[70:71].hex(), 16)
+        if vector_status == 17:
+            return (com, True)
+        else:
+            return(com, False)
 
-    def rendering_vector(self):
-        pass
+    def rendering_vector(self, com_results):
+        com, result = com_results
+        table_port = Table.table_ports_dict[com.port]
+        
+        if com.vector_status:
+            return None
+        else:
+            if result:
+                table_port.vector_frame['background'] = 'green'
+                table_port.vector_label['background'] = 'green'
+                com.vector_status = True
+            else:
+                table_port.vector_frame['background'] = 'red'
+                table_port.vector_label['background'] = 'red'
 
 
 def start():
     check_conection['state'] = 'disabled'
-    start['state'] = 'disabled'
+    start_button['state'] = 'disabled'
+    vector_button['state'] = 'disabled'
     comport.is_run = True
     ready_ports = comport.init_comports()
     [port.write(comport.request) for port in ready_ports]
     sleep(1)
+
     def running():
         if comport.is_run:
+            check = time()
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
             restart_list = [port.warm_request for port in comport.active_ports]
             if True in restart_list:
-                warm_restart['state'] = 'disabled'
+                warm_restart_button['state'] = 'disabled'
             else:
-                warm_restart['state'] = 'normal'
+                warm_restart_button['state'] = 'normal'
+            check_end = time()
+            res = check_end - check
+            print(res)
             Tk.after(window, 100, running)
 
     running()
@@ -236,30 +276,36 @@ def start():
 
 def start_vector():
     check_conection['state'] = 'disabled'
-    start['state'] = 'disabled'
+    start_button['state'] = 'disabled'
+    vector_button['state'] = 'disabled'
+    warm_restart_button['state'] = 'disabled'
     comport.is_run = True
     ready_ports = comport.init_comports()
-    [port.write(comport.request_vector) for port in ready_ports]
-    sleep(1)
+    [port.write(comport.vector_request) for port in ready_ports]
     timer_start = time()
     def running():
-        timer_continue = time()
-        timer_result = timer_continue - timer_start
-        if int(timer_result) >= 36:
-            stop()                
-        else:
-            read_results = [comport.read_binr_vector(port) for port in ready_ports]
-            parse_results = [comport.parse_binr_vector(port) for port in read_results]
-            [comport.rendering_vector(port) for port in parse_results]
-            Tk.after(window, 100, running)
 
-    if comport.is_run:
-        running()
+        if comport.is_run:
+            timer_continue = time()
+            timer_result = timer_continue - timer_start + 1
+            if int(timer_result) > 36:
+                stop()                
+            else:
+                read_results = [comport.read_binr_vector(port) for port in ready_ports]
+                parse_results = [comport.parse_binr_vector(port) for port in read_results]
+                [comport.rendering_vector(port) for port in parse_results]
+                timer['text'] = f'Total time: {int(timer_result)} c'
+                Tk.after(window, 100, running)
+
+    running()
+
 
 def stop():
     comport.is_run = False
     check_conection['state'] = 'normal'
-    start['state'] = 'normal'
+    start_button['state'] = 'normal'
+    vector_button['state'] = 'normal'
+    warm_restart_button['state'] = 'normal'
     comport.active_names.clear()
     for port in comport.active_ports.copy():
         port.write(comport.stop_request)
@@ -297,20 +343,20 @@ if __name__ == '__main__':
     frame_start = Frame(window, width=80, height=45, background='white')
     frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='w')
     frame_start.grid_propagate(False)
-    start = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=start)
-    start.place(relx=0.5, rely=0.5, anchor='center')
+    start_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=start)
+    start_button.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
     frame_stop.grid(columnspan=3, column=23, row=37, pady=HEAD_H, sticky='w')
     frame_stop.grid_propagate(False)
-    stop = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
-    stop.place(relx=0.5, rely=0.5, anchor='center')
+    stop_button = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
+    stop_button.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_restart = Frame(window, width=120, height=45, background='white')
     frame_restart.grid(columnspan=4, column=6, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    warm_restart = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
-    warm_restart.place(relx=0.5, rely=0.5, anchor='center')
+    warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
+    warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
     oc_variable = IntVar()
     oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white')
@@ -326,11 +372,11 @@ if __name__ == '__main__':
     vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=start_vector)
     vector_button.place(relx=0.5, rely=0.5, anchor='center')
 
-    timer_frame = Frame(window, width=80, height=45, background='white')
+    timer_frame = Frame(window, width=120, height=45, background='white')
     timer_frame.grid(columnspan=3, column=25, row=37)
     timer_frame.grid_propagate(False)
-    timer = Label(timer_frame, text='1', font='Arial 12', background='white')
-    timer.grid()
+    timer = Label(timer_frame, text='', font='Arial 12', background='white')
+    timer.place(relx=0.5, rely=0.5, anchor='center')
 
     window.mainloop()
     
