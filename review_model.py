@@ -116,6 +116,8 @@ class ParsingComports():
                 return (com, None)
         elif com.warm_request:
             sleep(3)
+            table_port = Table.table_ports_dict[com.port]
+            table_port.start_time = time()
             com.write(self.request)
             com.warm_request = False
             return (com, None)
@@ -124,8 +126,6 @@ class ParsingComports():
 
     def parse_binr(self, com_response):
         com, response = com_response
-        if response == False:
-            print(response)
         if response:
             code_list = []
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -137,12 +137,22 @@ class ParsingComports():
                 system_index += 20
                 signal_index += 20
             count_results = {sputnik: code_list.count(self.sputnik_values[sputnik]) for sputnik in self.sputnik_values}
+            if count_results['gps_l2_l'] > count_results['gps_l2_m']:
+                count_results['gps_l2_l_m'] = count_results['gps_l2_l']
+            else:
+                count_results['gps_l2_l_m'] = count_results['gps_l2_m']
+
+            del count_results['gps_l2_l']
+            del count_results['gps_l2_m']
             return (com, count_results)
         return (com, None)
 
     def rendering(self, com_results):
         com, results = com_results
         table_port = Table.table_ports_dict[com.port]
+        current_time = int(time() - table_port.start_time)
+        if current_time <= 36:
+            table_port.totaltime_label['text'] = f'00:00:{ current_time }'
         
         if results:  
             table_port.title_frame['background'] = 'yellow'
@@ -155,6 +165,7 @@ class ParsingComports():
                     frame['background'] = '#4fdb37'
                 else:
                     frame['background'] = '#fc4838'
+
         if table_port.restart_status:
             com.write(self.stop_request)
             com.write(self.warm_restart)
@@ -190,6 +201,8 @@ class ParsingComports():
             com.write(self.warm_restart)
         
         sleep(3)
+        for table_port in Table.table_ports:
+            table_port.start_time = time()
         for com in self.active_ports:
             com.write(self.request)
 
@@ -203,95 +216,24 @@ class ParsingComports():
             table_port = Table.table_ports_dict[port.port]
             table_port.var_sc.set(1)
 
-    def read_binr_vector(self, com):
-        response = b'' 
-        if com.in_waiting >= 74:
-                response += com.read(com.in_waiting)
-                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
-                    com.reset_input_buffer()
-                    return (com, response)
-                else:
-                    return (com, None)    
-        else:
-            return (com, None)
-
-    def parse_binr_vector(self, com_response):
-        com, response = com_response
-        vector_status = False
-        if response:
-            response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-            vector_status = int(response_clear[70:71].hex(), 16)
-        if vector_status == 17:
-            return (com, True)
-        else:
-            return(com, False)
-
-    def rendering_vector(self, com_results):
-        com, result = com_results
-        table_port = Table.table_ports_dict[com.port]
-        
-        if com.vector_status:
-            return None
-        else:
-            if result:
-                table_port.vector_frame['background'] = 'green'
-                table_port.vector_label['background'] = 'green'
-                com.vector_status = True
-            else:
-                table_port.vector_frame['background'] = 'red'
-                table_port.vector_label['background'] = 'red'
-
 
 def start():
     check_conection['state'] = 'disabled'
     start_button['state'] = 'disabled'
-    vector_button['state'] = 'disabled'
     comport.is_run = True
     ready_ports = comport.init_comports()
     [port.write(comport.request) for port in ready_ports]
     sleep(1)
-
+    for table_port in Table.table_ports:
+        table_port.start_time = time()
+    
     def running():
         if comport.is_run:
-            check = time()
             read_results = [comport.read_binr(port) for port in ready_ports]
             parse_results = [comport.parse_binr(port) for port in read_results]
             [comport.rendering(port) for port in parse_results]
-            restart_list = [port.warm_request for port in comport.active_ports]
-            if True in restart_list:
-                warm_restart_button['state'] = 'disabled'
-            else:
-                warm_restart_button['state'] = 'normal'
-            check_end = time()
-            res = check_end - check
-            print(res)
             Tk.after(window, 100, running)
 
-    running()
-
-
-def start_vector():
-    check_conection['state'] = 'disabled'
-    start_button['state'] = 'disabled'
-    vector_button['state'] = 'disabled'
-    warm_restart_button['state'] = 'disabled'
-    comport.is_run = True
-    ready_ports = comport.init_comports()
-    [port.write(comport.vector_request) for port in ready_ports]
-    timer_start = time()
-
-    def running():
-        if comport.is_run:
-            timer_continue = time()
-            timer_result = timer_continue - timer_start + 1
-            if int(timer_result) > 36:
-                stop()                
-            else:
-                read_results = [comport.read_binr_vector(port) for port in ready_ports]
-                parse_results = [comport.parse_binr_vector(port) for port in read_results]
-                [comport.rendering_vector(port) for port in parse_results]
-                timer['text'] = f'Total time: {int(timer_result)} c'
-                Tk.after(window, 100, running)
     running()
 
 
@@ -299,7 +241,6 @@ def stop():
     comport.is_run = False
     check_conection['state'] = 'normal'
     start_button['state'] = 'normal'
-    vector_button['state'] = 'normal'
     warm_restart_button['state'] = 'normal'
     comport.active_names.clear()
     for port in comport.active_ports.copy():
@@ -360,12 +301,6 @@ if __name__ == '__main__':
     sc_variable = IntVar()
     sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_variable, command=comport.set_sc, background='white')
     sc_checkbok.grid(column=3, columnspan=2, row=37, sticky='w')
-
-    verctor_frame = Frame(window, width=120, height=45, background='white')
-    verctor_frame.grid(columnspan=4, column=17, row=37, pady=HEAD_H, sticky='we')
-    frame_stop.grid_propagate(False)
-    vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=start_vector)
-    vector_button.place(relx=0.5, rely=0.5, anchor='center')
 
     timer_frame = Frame(window, width=120, height=45, background='white')
     timer_frame.grid(columnspan=3, column=25, row=37)

@@ -39,13 +39,12 @@ class Table():
                  'gln_l2sc_p_tu', 'gln_l2sc_p_fact', 'gln_l2sc_p_status_frame',
                  'gln_l2sc_d_tu', 'gln_l2sc_d_fact', 'gln_l2sc_d_status_frame',
                  'gps_l1_tu', 'gps_l1_fact', 'gps_l1_status_frame',
-                 'gps_l2_l_tu', 'gps_l2_l_fact', 'gps_l2_l_status_frame',
-                 'gps_l2_m_tu', 'gps_l2_m_fact', 'gps_l2_m_status_frame',
+                 'gps_l2_l_m_tu', 'gps_l2_l_m_fact', 'gps_l2_l_m_status_frame',
                  'sdkm_tu', 'sdkm_fact', 'sdkm_status_frame',
                  'sdps_tu', 'sdps_fact', 'sdps_status_frame',
                  'title_label', 'title', 'number', 'restart_status', 'var_oc', 'var_sc',
-                 'oc_complite', 'sc_complite', 'title_frame', 'restart_button', 'vector_frame',
-                 'vector_label',
+                 'oc_complite', 'sc_complite', 'title_frame', 'restart_button', 'totaltime_frame',
+                 'totaltime_label', 'start_time'
                  )
 
     def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
@@ -79,25 +78,25 @@ class Table():
         sc_checkbox.place(relx=0.7, rely=0.5, anchor='center')
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
-        frame_names.grid(column=0 + col, row=1 + row, padx=pad_x)
+        frame_names.grid(column=0 + col, row=2 + row, padx=pad_x)
         frame_names.grid_propagate(False)
         label_names = Label(frame_names, text='Диапозон', borderwidth=1, font=f'Times {head_font} bold', background='#bbd0f2')
         label_names.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h - 7, background='#bbd0f2')
-        frame_const.grid(row=1 + row, column=1 + col)
+        frame_const.grid(row=2 + row, column=1 + col)
         frame_const.grid_propagate(False)
         label_const = Label(frame_const, text='ТУ', font=f'Times {head_font} bold', background='#bbd0f2')
         label_const.place(relx=0.45, rely=0.5, anchor='center')
 
         frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h - 7, background='#bbd0f2')
-        frame_count.grid(row=1 + row, column=2 + col)
+        frame_count.grid(row=2 + row, column=2 + col)
         frame_count.grid_propagate(False)
         frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
         frame_count.place(relx=0.445, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h - 7, background='#bbd0f2')
-        frame_status.grid(row=1 + row, column=3 + col)
+        frame_status.grid(row=2 + row, column=3 + col)
         frame_status.grid_propagate(False)
         label_status = Label(frame_status, text='Реш.', font=f'Times {head_font - 1} bold', background='#bbd0f2')
         label_status.place(relx=0.5, rely=0.5, anchor='center')
@@ -430,57 +429,57 @@ class Table():
         self.gps_l1_status_frame.grid_propagate(False)
 
         """GPS L2"""
-        gps_l2_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2), background='#f5fcff')
-        gps_l2_mix.grid(row=15 + row, column= 0 + col, sticky='w', padx=pad_x)
-        gps_l2_mix.grid_propagate(False)
-        gps_l2_mix_label = Label(gps_l2_mix, text='GPS L2', font=body_font, background='#f5fcff')
-        gps_l2_mix_label.place(rely=0.5, anchor='w')
+        #gps_l2_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2), background='#f5fcff')
+        #gps_l2_mix.grid(row=15 + row, column= 0 + col, sticky='w', padx=pad_x)
+        #gps_l2_mix.grid_propagate(False)
+        #gps_l2_mix_label = Label(gps_l2_mix, text='GPS L2', font=body_font, background='#f5fcff')
+        #gps_l2_mix_label.place(rely=0.5, anchor='w')
 
         """GPS L2L"""
-        gps_l2_l_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
-        gps_l2_l_title.grid(row=15 + row, column=0 + col, sticky='en')
-        gps_l2_l_title.grid_propagate(False)
-        gps_l2_l_label = Label(gps_l2_l_title, text='L', font=body_font, background='#f5fcff')
-        gps_l2_l_label.place(relx=0.5, rely=0.5, anchor='center')
+        gps_l2_l_m_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h, background='#f5fcff')
+        gps_l2_l_m_title.grid(row=15 + row, column=0 + col, padx=pad_x)
+        gps_l2_l_m_title.grid_propagate(False)
+        gps_l2_l_label = Label(gps_l2_l_m_title, text='GPS L2 L/M', font=body_font, background='#f5fcff')
+        gps_l2_l_label.grid()
 
-        gps_l2_l_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
-        gps_l2_l_tu.grid(row=15 + row, column=1 + col, sticky='n')
-        gps_l2_l_tu.grid_propagate(False)
-        self.gps_l2_l_tu = Label(gps_l2_l_tu, text='8', font=body_font, background='#f5fcff')
-        self.gps_l2_l_tu.place(relx=0.5, rely=0.5, anchor='center')
+        gps_l2_l_m_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
+        gps_l2_l_m_tu.grid(row=15 + row, column=1 + col, sticky='n')
+        gps_l2_l_m_tu.grid_propagate(False)
+        self.gps_l2_l_m_tu = Label(gps_l2_l_m_tu, text='8', font=body_font, background='#f5fcff')
+        self.gps_l2_l_m_tu.place(relx=0.5, rely=0.5, anchor='center')
 
-        gps_l2_l_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
-        gps_l2_l_fact.grid(row=15 + row, column=2 + col, sticky='n')
-        gps_l2_l_fact.grid_propagate(False)
-        self.gps_l2_l_fact = Label(gps_l2_l_fact, text='0', font=body_font, background='#f5fcff')
-        self.gps_l2_l_fact.place(relx=0.5, rely=0.5, anchor='center')
+        gps_l2_l_m_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
+        gps_l2_l_m_fact.grid(row=15 + row, column=2 + col, sticky='n')
+        gps_l2_l_m_fact.grid_propagate(False)
+        self.gps_l2_l_m_fact = Label(gps_l2_l_m_fact, text='0', font=body_font, background='#f5fcff')
+        self.gps_l2_l_m_fact.place(relx=0.5, rely=0.5, anchor='center')
 
-        self.gps_l2_l_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
-        self.gps_l2_l_status_frame.grid(row=15 + row, column=3 + col, sticky='n')
-        self.gps_l2_l_status_frame.grid_propagate(False)
+        self.gps_l2_l_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
+        self.gps_l2_l_m_status_frame.grid(row=15 + row, column=3 + col, sticky='n')
+        self.gps_l2_l_m_status_frame.grid_propagate(False)
 
         """GPS L2M"""
-        gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
-        gps_l2_m_title.grid(row=15 + row, column=0 + col, sticky='es')
-        gps_l2_m_title.grid_propagate(False)
-        gps_l2_m_label = Label(gps_l2_m_title, text='M', font=body_font, background='#f5fcff')
-        gps_l2_m_label.place(relx=0.5, rely=0.5, anchor='center')
-
-        gps_l2_m_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
-        gps_l2_m_tu.grid(row=15 + row, column=1 + col, sticky='s')
-        gps_l2_m_tu.grid_propagate(False)
-        self.gps_l2_m_tu = Label(gps_l2_m_tu, text='8', font=body_font, background='#f5fcff')
-        self.gps_l2_m_tu.place(relx=0.5, rely=0.5, anchor='center')
-
-        gps_l2_m_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
-        gps_l2_m_fact.grid(row=15 + row, column=2 + col, sticky='s')
-        gps_l2_m_fact.grid_propagate(False)
-        self.gps_l2_m_fact = Label(gps_l2_m_fact, text='0', font=body_font, background='#f5fcff')
-        self.gps_l2_m_fact.place(relx=0.5, rely=0.5, anchor='center')
-
-        self.gps_l2_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
-        self.gps_l2_m_status_frame.grid(row=15 + row, column=3 + col, sticky='s')
-        self.gps_l2_m_status_frame.grid_propagate(False)
+        #gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
+        #gps_l2_m_title.grid(row=15 + row, column=0 + col, sticky='es')
+        #gps_l2_m_title.grid_propagate(False)
+        #gps_l2_m_label = Label(gps_l2_m_title, text='M', font=body_font, background='#f5fcff')
+        #gps_l2_m_label.place(relx=0.5, rely=0.5, anchor='center')
+#
+        #gps_l2_m_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
+        #gps_l2_m_tu.grid(row=15 + row, column=1 + col, sticky='s')
+        #gps_l2_m_tu.grid_propagate(False)
+        #self.gps_l2_m_tu = Label(gps_l2_m_tu, text='8', font=body_font, background='#f5fcff')
+        #self.gps_l2_m_tu.place(relx=0.5, rely=0.5, anchor='center')
+#
+        #gps_l2_m_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
+        #gps_l2_m_fact.grid(row=15 + row, column=2 + col, sticky='s')
+        #gps_l2_m_fact.grid_propagate(False)
+        #self.gps_l2_m_fact = Label(gps_l2_m_fact, text='0', font=body_font, background='#f5fcff')
+        #self.gps_l2_m_fact.place(relx=0.5, rely=0.5, anchor='center')
+#
+        #self.gps_l2_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
+        #self.gps_l2_m_status_frame.grid(row=15 + row, column=3 + col, sticky='s')
+        #self.gps_l2_m_status_frame.grid_propagate(False)
 
         """СДКМ"""
         sdkm_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h, background='#f5fcff')
@@ -528,12 +527,12 @@ class Table():
         self.sdps_status_frame.grid(row=17 + row, column=3 + col)
         self.sdps_status_frame.grid_propagate(False)
 
-        self.vector_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
-        self.vector_frame.grid_propagate(False)
-        self.vector_frame.grid(row=2 + row, column=col, columnspan=4, padx=pad_x)
+        self.totaltime_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
+        self.totaltime_frame.grid_propagate(False)
+        self.totaltime_frame.grid(row=1 + row, column=col, columnspan=4, padx=pad_x)
 
-        self.vector_label = Label(self.vector_frame, text='Вектор состояния', font=body_font, background='#f5fcff')
-        self.vector_label.place(relx=0.5, rely=0.5, anchor='center')
+        self.totaltime_label = Label(self.totaltime_frame, text='00:00:00', font=body_font, background='#f5fcff')
+        self.totaltime_label.place(relx=0.5, rely=0.5, anchor='center')
 
         pas_frame = Frame(window, height=10)
         pas_frame.grid(row=18)
