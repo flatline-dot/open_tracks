@@ -189,16 +189,27 @@ class ParsingComports():
             table_port.sc_complite = True
 
     def vector_read(self, com):
-        response = b'' 
-        if com.in_waiting >= 74:
-            response += com.read(com.in_waiting)
-            if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
-                com.reset_input_buffer()
-                return (com, response)
+        response = b''
+        if not com.warm_request:
+            if com.in_waiting >= 74:
+                response += com.read(com.in_waiting)
+                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                    com.reset_input_buffer()
+                    return (com, response)
+                else:
+                    return (com, None)
             else:
-                return (com, None)    
+                return (com, None)
+        elif com.warm_request:
+            sleep(3)
+            table_port = Table.table_ports_dict[com.port]
+            table_port.start_time = time()
+            com.write(self.request)
+            com.warm_request = False
+            return (com, None)
         else:
             return (com, None)
+
 
     def vector_parse(self, com_response):
         com, response = com_response
@@ -206,6 +217,8 @@ class ParsingComports():
         if response:
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
             vector_status = int(response_clear[70:71].hex(), 16)
+        else:
+            return(com, False)
         if vector_status == 17 or vector_status == 25:
             return (com, True)
         else:
@@ -214,18 +227,35 @@ class ParsingComports():
     def vector_rendering(self, com_results):
         com, result = com_results
         table_port = Table.table_ports_dict[com.port]
+        current_time = int(time() - table_port.start_time)
+        if current_time <= 36:
+            table_port.totaltime_label['text'] = f'00:00:{ current_time }'
         
         if com.vector_status:
             return None
         else:
             if result:
-                table_port.vector_frame['background'] = 'green'
-                table_port.vector_label['background'] = 'green'
+                table_port.vector_status_frame['background'] = 'green'
+                table_port.vector_status_label['background'] = 'green'
                 com.vector_status = True
             else:
-                table_port.vector_frame['background'] = 'red'
-                table_port.vector_label['background'] = 'red'
-        
+                table_port.vector_status_frame['background'] = 'red'
+                table_port.vector_status_label['background'] = 'red'
+
+        if table_port.restart_status:
+            com.write(self.stop_request)
+            com.write(self.warm_restart)
+            table_port.restart_status = False
+            table_port.restart_button['state'] = 'disabled'
+            com.warm_request = True
+            table_port.var_oc.set(0)
+            table_port.var_sc.set(0)
+            table_port.oc_complite = False
+            table_port.sc_complite = False
+            com.vector_status = False
+        else:
+            table_port.restart_button['state'] = 'normal'
+
     def warm_restart_general(self):
         oc_general.set(0)
         sc_general.set(0)
@@ -234,15 +264,17 @@ class ParsingComports():
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
-
-        for com in self.active_ports:
-            com.write(self.warm_restart)
         
+        for com in self.active_ports:
+            com.vector_status = False
+            com.write(self.warm_restart)
+
         sleep(3)
-        for table_port in Table.table_ports:
-            table_port.start_time = time()
+        
         for com in self.active_ports:
             com.write(self.request)
+        for table_port in Table.table_ports:
+            table_port.start_time = time()
 
     def set_oc(self):
         for port in self.active_ports:
@@ -271,11 +303,10 @@ def start():
     
     if comport.info_tracks_isrun:
         [port.write(comport.request) for port in ready_ports]
-        sleep(1)
         for table_port in Table.table_ports:
             table_port.start_time = time()
         def running():
-            if comport.is_run:
+            if comport.info_tracks_isrun:
                 read_results = [comport.info_tracks_read(port) for port in ready_ports]
                 parse_results = [comport.info_tracks_parse(port) for port in read_results]
                 [comport.info_tracks_rendering(port) for port in parse_results]
@@ -285,11 +316,10 @@ def start():
 
     if comport.info_vector_isrun:
         [port.write(comport.vector_request) for port in ready_ports]
-        sleep(1)
         for table_port in Table.table_ports:
             table_port.start_time = time()
         def running():
-            if comport.is_run:
+            if comport.info_vector_isrun:
                 read_results = [comport.vector_read(port) for port in ready_ports]
                 parse_results = [comport.vector_parse(port) for port in read_results]
                 [comport.vector_rendering(port) for port in parse_results]
@@ -322,49 +352,55 @@ if __name__ == '__main__':
     Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
     Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
     Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
-    Table(window, col=0, row=19, port='COM9')
-    Table(window, col=4, row=19, port='COM10', pad_x=PAD_X)
-    Table(window, col=8, row=19, port='COM11', pad_x=PAD_X)
-    Table(window, col=12, row=19, port='COM12', pad_x=PAD_X)
-    Table(window, col=16, row=19, port='COM13', pad_x=PAD_X)
-    Table(window, col=20, row=19, port='COM14', pad_x=PAD_X)
-    Table(window, col=24, row=19, port='COM15', pad_x=PAD_X)
-    Table(window, col=28, row=19, port='COM16', pad_x=PAD_X)
+    Table(window, col=0, row=20, port='COM9')
+    Table(window, col=4, row=20, port='COM10', pad_x=PAD_X)
+    Table(window, col=8, row=20, port='COM11', pad_x=PAD_X)
+    Table(window, col=12, row=20, port='COM12', pad_x=PAD_X)
+    Table(window, col=16, row=20, port='COM13', pad_x=PAD_X)
+    Table(window, col=20, row=20, port='COM14', pad_x=PAD_X)
+    Table(window, col=24, row=20, port='COM15', pad_x=PAD_X)
+    Table(window, col=28, row=20, port='COM16', pad_x=PAD_X)
 
     frame_check = Frame(window, width=120, height=45, background='white')
-    frame_check.grid(columnspan=4, column=10, row=37, pady=HEAD_H, sticky='we')
+    frame_check.grid(columnspan=4, column=10, row=40, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.check_connections)
     check_conection.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_start = Frame(window, width=80, height=45, background='white')
-    frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='w')
+    frame_start.grid(columnspan=3, column=16, row=40, pady=HEAD_H, sticky='w')
     frame_start.grid_propagate(False)
     info_tracks_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=info_tracks_ctrl)
     info_tracks_button.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
-    frame_stop.grid(columnspan=3, column=23, row=37, pady=HEAD_H, sticky='w')
+    frame_stop.grid(columnspan=3, column=23, row=40, pady=HEAD_H, sticky='w')
     frame_stop.grid_propagate(False)
     stop_button = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
     stop_button.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_restart = Frame(window, width=120, height=45, background='white')
-    frame_restart.grid(columnspan=4, column=6, row=37, pady=HEAD_H, sticky='we')
+    frame_restart.grid(columnspan=4, column=6, row=40, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
     warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.warm_restart_general)
     warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
+    verctor_frame = Frame(window, width=120, height=45, background='white')
+    verctor_frame.grid(columnspan=4, column=17, row=40, pady=HEAD_H, sticky='we')
+    verctor_frame.grid_propagate(False)
+    vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=info_vector_ctrl)
+    vector_button.place(relx=0.5, rely=0.5, anchor='center')
+
     oc_general = IntVar()
     oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_general,command=comport.set_oc, background='white', borderwidth=1)
-    oc_checkbok.grid(column=4, row=37)
+    oc_checkbok.grid(column=4, row=40)
 
     sc_general = IntVar()
     sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_general, command=comport.set_sc, background='white')
-    sc_checkbok.grid(column=3, columnspan=2, row=37, sticky='w')
+    sc_checkbok.grid(column=3, columnspan=2, row=40, sticky='w')
 
     timer_frame = Frame(window, width=120, height=45, background='white')
-    timer_frame.grid(columnspan=3, column=25, row=37)
+    timer_frame.grid(columnspan=3, column=25, row=40)
     timer_frame.grid_propagate(False)
     timer = Label(timer_frame, text='', font='Arial 14', background='white')
     timer.place(relx=0.5, rely=0.5, anchor='center')
