@@ -43,7 +43,8 @@ class ParsingComports():
         self.response_27 = bytearray([16, 231, 27, 1, 16, 3])
         self.active_names = []
         self.active_ports = []
-        self.is_run = True
+        self.info_tracks_isrun = False
+        self.info_vector_isrun = False
 
     def check_connections(self):
         instance_ports = []
@@ -101,17 +102,16 @@ class ParsingComports():
                 self.active_ports.append(com)
         return self.active_ports
 
-    def read_binr(self, com):
+    def info_tracks_read(self, com):
         response = b''
         if not com.warm_request: 
             if com.in_waiting >= 1924:
-                while True:
-                    response += com.read(com.in_waiting)
-                    if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
-                        if self.response_21 in response or self.response_25 in response or self.response_27 in response or self.response_restart in response or self.response_restart_2 in response:
-                            return (com, False)
-                        com.reset_input_buffer()
-                        return (com, response)
+                response += com.read(com.in_waiting)
+                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                    if self.response_21 in response or self.response_25 in response or self.response_27 in response or self.response_restart in response or self.response_restart_2 in response:
+                        return (com, False)
+                    com.reset_input_buffer()
+                    return (com, response)
             else:
                 return (com, None)
         elif com.warm_request:
@@ -124,7 +124,7 @@ class ParsingComports():
         else:
             return (com, None)
 
-    def parse_binr(self, com_response):
+    def info_tracks_parse(self, com_response):
         com, response = com_response
         if response:
             code_list = []
@@ -147,7 +147,7 @@ class ParsingComports():
             return (com, count_results)
         return (com, None)
 
-    def rendering(self, com_results):
+    def info_tracks_rendering(self, com_results):
         com, results = com_results
         table_port = Table.table_ports_dict[com.port]
         current_time = int(time() - table_port.start_time)
@@ -188,9 +188,9 @@ class ParsingComports():
             com.write(self.param_27)
             table_port.sc_complite = True
 
-    def all_warm_restart(self):
-        oc_variable.set(0)
-        sc_variable.set(0)
+    def warm_restart_general(self):
+        oc_general.set(0)
+        sc_general.set(0)
         for table_port in Table.table_ports:
             table_port.var_oc.set(0)
             table_port.var_sc.set(0)
@@ -217,31 +217,37 @@ class ParsingComports():
             table_port.var_sc.set(1)
 
 
+def info_tracks_ctrl():
+    comport.info_tracks_isrun = True
+    start()
+
+def info_vector_ctrl():
+    comport.info_vector_isrun = True
+    start()
+
 def start():
     check_conection['state'] = 'disabled'
-    start_button['state'] = 'disabled'
-    comport.is_run = True
+    info_tracks_button['state'] = 'disabled'
     ready_ports = comport.init_comports()
     [port.write(comport.request) for port in ready_ports]
     sleep(1)
     for table_port in Table.table_ports:
         table_port.start_time = time()
-    
-    def running():
-        if comport.is_run:
-            read_results = [comport.read_binr(port) for port in ready_ports]
-            parse_results = [comport.parse_binr(port) for port in read_results]
-            [comport.rendering(port) for port in parse_results]
-            Tk.after(window, 100, running)
+    if comport.info_tracks_isrun:
+        def running():
+            if comport.is_run:
+                read_results = [comport.info_tracks_read(port) for port in ready_ports]
+                parse_results = [comport.info_tracks_parse(port) for port in read_results]
+                [comport.info_tracks_rendering(port) for port in parse_results]
+                Tk.after(window, 100, running)
 
-    running()
+        running()
 
 
 def stop():
     comport.is_run = False
     check_conection['state'] = 'normal'
-    start_button['state'] = 'normal'
-    warm_restart_button['state'] = 'normal'
+    info_tracks_button['state'] = 'normal'
     comport.active_names.clear()
     for port in comport.active_ports.copy():
         port.write(comport.stop_request)
@@ -279,8 +285,8 @@ if __name__ == '__main__':
     frame_start = Frame(window, width=80, height=45, background='white')
     frame_start.grid(columnspan=3, column=16, row=37, pady=HEAD_H, sticky='w')
     frame_start.grid_propagate(False)
-    start_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=start)
-    start_button.place(relx=0.5, rely=0.5, anchor='center')
+    info_tracks_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=info_tracks_ctrl)
+    info_tracks_button.place(relx=0.5, rely=0.5, anchor='center')
 
     frame_stop = Frame(window, width=80, height=45, background='white')
     frame_stop.grid(columnspan=3, column=23, row=37, pady=HEAD_H, sticky='w')
@@ -291,15 +297,15 @@ if __name__ == '__main__':
     frame_restart = Frame(window, width=120, height=45, background='white')
     frame_restart.grid(columnspan=4, column=6, row=37, pady=HEAD_H, sticky='we')
     frame_check.grid_propagate(False)
-    warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.all_warm_restart)
+    warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.warm_restart_general)
     warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
-    oc_variable = IntVar()
-    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_variable,command=comport.set_oc, background='white', borderwidth=1)
+    oc_general = IntVar()
+    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_general,command=comport.set_oc, background='white', borderwidth=1)
     oc_checkbok.grid(column=4, row=37)
 
-    sc_variable = IntVar()
-    sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_variable, command=comport.set_sc, background='white')
+    sc_general = IntVar()
+    sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_general, command=comport.set_sc, background='white')
     sc_checkbok.grid(column=3, columnspan=2, row=37, sticky='w')
 
     timer_frame = Frame(window, width=120, height=45, background='white')
