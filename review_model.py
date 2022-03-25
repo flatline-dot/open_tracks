@@ -188,6 +188,44 @@ class ParsingComports():
             com.write(self.param_27)
             table_port.sc_complite = True
 
+    def vector_read(self, com):
+        response = b'' 
+        if com.in_waiting >= 74:
+            response += com.read(com.in_waiting)
+            if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                com.reset_input_buffer()
+                return (com, response)
+            else:
+                return (com, None)    
+        else:
+            return (com, None)
+
+    def vector_parse(self, com_response):
+        com, response = com_response
+        vector_status = False
+        if response:
+            response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
+            vector_status = int(response_clear[70:71].hex(), 16)
+        if vector_status == 17 or vector_status == 25:
+            return (com, True)
+        else:
+            return(com, False)
+
+    def vector_rendering(self, com_results):
+        com, result = com_results
+        table_port = Table.table_ports_dict[com.port]
+        
+        if com.vector_status:
+            return None
+        else:
+            if result:
+                table_port.vector_frame['background'] = 'green'
+                table_port.vector_label['background'] = 'green'
+                com.vector_status = True
+            else:
+                table_port.vector_frame['background'] = 'red'
+                table_port.vector_label['background'] = 'red'
+        
     def warm_restart_general(self):
         oc_general.set(0)
         sc_general.set(0)
@@ -228,12 +266,14 @@ def info_vector_ctrl():
 def start():
     check_conection['state'] = 'disabled'
     info_tracks_button['state'] = 'disabled'
+    vector_button['state'] = 'disabled'
     ready_ports = comport.init_comports()
-    [port.write(comport.request) for port in ready_ports]
-    sleep(1)
-    for table_port in Table.table_ports:
-        table_port.start_time = time()
+    
     if comport.info_tracks_isrun:
+        [port.write(comport.request) for port in ready_ports]
+        sleep(1)
+        for table_port in Table.table_ports:
+            table_port.start_time = time()
         def running():
             if comport.is_run:
                 read_results = [comport.info_tracks_read(port) for port in ready_ports]
@@ -243,11 +283,26 @@ def start():
 
         running()
 
+    if comport.info_vector_isrun:
+        [port.write(comport.vector_request) for port in ready_ports]
+        sleep(1)
+        for table_port in Table.table_ports:
+            table_port.start_time = time()
+        def running():
+            if comport.is_run:
+                read_results = [comport.vector_read(port) for port in ready_ports]
+                parse_results = [comport.vector_parse(port) for port in read_results]
+                [comport.vector_rendering(port) for port in parse_results]
+                Tk.after(window, 100, running)
+
+        running()
 
 def stop():
-    comport.is_run = False
+    comport.info_tracks_isrun = False
+    comport.info_vector_isrun = False
     check_conection['state'] = 'normal'
     info_tracks_button['state'] = 'normal'
+    vector_button['state'] = 'normal'
     comport.active_names.clear()
     for port in comport.active_ports.copy():
         port.write(comport.stop_request)
