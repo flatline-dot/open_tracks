@@ -88,6 +88,7 @@ class ParsingComports():
                 com.timeout = 1
                 com.warm_request = False
                 com.vector_status = False
+                com.warm_request_start = True
                 self.active_ports.append(com)
         else:
             self.check_connections()
@@ -114,12 +115,14 @@ class ParsingComports():
                     return (com, response)
             else:
                 return (com, None)
-        elif com.warm_request:
-            sleep(3)
+        elif com.warm_request and ((time() - com.warm_restart_start) > 3):
+            #sleep(3)
+            com.warm_restart_start = True
             table_port = Table.table_ports_dict[com.port]
             table_port.start_time = time()
             com.write(self.request)
             com.warm_request = False
+            table_port.restart_button['state'] = 'normal'
             return (com, None)
         else:
             return (com, None)
@@ -150,9 +153,12 @@ class ParsingComports():
     def info_tracks_rendering(self, com_results):
         com, results = com_results
         table_port = Table.table_ports_dict[com.port]
-        current_time = int(time() - table_port.start_time)
-        if current_time <= 36:
-            table_port.totaltime_label['text'] = f'00:00:{ current_time }'
+        if table_port.start_time == 'Restart':
+            table_port.totaltime_label['text'] = 'Restart'
+        else:
+            current_time = int(time() - table_port.start_time)
+            if current_time <= 36:
+                table_port.totaltime_label['text'] = f'00:00:{ current_time }'
         
         if results:  
             table_port.title_frame['background'] = 'yellow'
@@ -169,6 +175,8 @@ class ParsingComports():
         if table_port.restart_status:
             com.write(self.stop_request)
             com.write(self.warm_restart)
+            com.warm_restart_start = time()
+            table_port.start_time = 'Restart'
             table_port.restart_status = False
             table_port.restart_button['state'] = 'disabled'
             com.warm_request = True
@@ -176,8 +184,8 @@ class ParsingComports():
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
-        else:
-            table_port.restart_button['state'] = 'normal'
+        #else:
+        #    table_port.restart_button['state'] = 'normal'
 
         if table_port.var_oc.get() and not table_port.oc_complite:
             com.write(self.param_21)
@@ -200,16 +208,17 @@ class ParsingComports():
                     return (com, None)
             else:
                 return (com, None)
-        elif com.warm_request:
-            sleep(3)
+        elif com.warm_request and ((time() - com.warm_restart_start) > 3):
+            #sleep(3)
+            com.warm_restart_start = True
             table_port = Table.table_ports_dict[com.port]
             table_port.start_time = time()
             com.write(self.request)
             com.warm_request = False
+            table_port.restart_button['state'] = 'normal'
             return (com, None)
         else:
             return (com, None)
-
 
     def vector_parse(self, com_response):
         com, response = com_response
@@ -227,9 +236,12 @@ class ParsingComports():
     def vector_rendering(self, com_results):
         com, result = com_results
         table_port = Table.table_ports_dict[com.port]
-        current_time = int(time() - table_port.start_time)
-        if current_time <= 36:
-            table_port.totaltime_label['text'] = f'00:00:{ current_time }'
+        if table_port.start_time == 'Restart':
+            table_port.totaltime_label['text'] = 'Restart'
+        else:
+            current_time = int(time() - table_port.start_time)
+            if current_time <= 36:
+                table_port.totaltime_label['text'] = f'00:00:{ current_time }'
         
         if com.vector_status:
             return None
@@ -245,6 +257,8 @@ class ParsingComports():
         if table_port.restart_status:
             com.write(self.stop_request)
             com.write(self.warm_restart)
+            com.warm_restart_start = time()
+            table_port.start_time = 'Restart'
             table_port.restart_status = False
             table_port.restart_button['state'] = 'disabled'
             com.warm_request = True
@@ -253,8 +267,6 @@ class ParsingComports():
             table_port.oc_complite = False
             table_port.sc_complite = False
             com.vector_status = False
-        else:
-            table_port.restart_button['state'] = 'normal'
 
     def warm_restart_general(self):
         oc_general.set(0)
@@ -264,7 +276,7 @@ class ParsingComports():
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
-        
+
         for com in self.active_ports:
             com.vector_status = False
             com.write(self.warm_restart)
