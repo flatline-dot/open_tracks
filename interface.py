@@ -1,4 +1,3 @@
-from tabnanny import check
 from tkinter import Tk, Frame, Label, Button, IntVar, Checkbutton
 
 window = Tk()
@@ -85,14 +84,6 @@ class Table():
 
         self.vector_status_label = Label(self.vector_status_frame, text='Вектор состояния', font=f'{body_font} bold', background='#f5fcff')
         self.vector_status_label.place(relx=0.5, rely=0.5, anchor='center')
-
-
-
-
-
-
-
-
 
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
@@ -446,14 +437,7 @@ class Table():
         self.gps_l1_status_frame.grid(row=15 + row, column=3 + col)
         self.gps_l1_status_frame.grid_propagate(False)
 
-        """GPS L2"""
-        #gps_l2_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2), background='#f5fcff')
-        #gps_l2_mix.grid(row=15 + row, column= 0 + col, sticky='w', padx=pad_x)
-        #gps_l2_mix.grid_propagate(False)
-        #gps_l2_mix_label = Label(gps_l2_mix, text='GPS L2', font=body_font, background='#f5fcff')
-        #gps_l2_mix_label.place(rely=0.5, anchor='w')
-
-        """GPS L2L"""
+        """GPS L2L_M"""
         gps_l2_l_m_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h, background='#f5fcff')
         gps_l2_l_m_title.grid(row=16 + row, column=0 + col, padx=pad_x)
         gps_l2_l_m_title.grid_propagate(False)
@@ -475,29 +459,6 @@ class Table():
         self.gps_l2_l_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
         self.gps_l2_l_m_status_frame.grid(row=16 + row, column=3 + col, sticky='n')
         self.gps_l2_l_m_status_frame.grid_propagate(False)
-
-        """GPS L2M"""
-        #gps_l2_m_title = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.31), height=body_h, background='#f5fcff')
-        #gps_l2_m_title.grid(row=15 + row, column=0 + col, sticky='es')
-        #gps_l2_m_title.grid_propagate(False)
-        #gps_l2_m_label = Label(gps_l2_m_title, text='M', font=body_font, background='#f5fcff')
-        #gps_l2_m_label.place(relx=0.5, rely=0.5, anchor='center')
-#
-        #gps_l2_m_tu = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=body_h, background='#f5fcff')
-        #gps_l2_m_tu.grid(row=15 + row, column=1 + col, sticky='s')
-        #gps_l2_m_tu.grid_propagate(False)
-        #self.gps_l2_m_tu = Label(gps_l2_m_tu, text='8', font=body_font, background='#f5fcff')
-        #self.gps_l2_m_tu.place(relx=0.5, rely=0.5, anchor='center')
-#
-        #gps_l2_m_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
-        #gps_l2_m_fact.grid(row=15 + row, column=2 + col, sticky='s')
-        #gps_l2_m_fact.grid_propagate(False)
-        #self.gps_l2_m_fact = Label(gps_l2_m_fact, text='0', font=body_font, background='#f5fcff')
-        #self.gps_l2_m_fact.place(relx=0.5, rely=0.5, anchor='center')
-#
-        #self.gps_l2_m_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
-        #self.gps_l2_m_status_frame.grid(row=15 + row, column=3 + col, sticky='s')
-        #self.gps_l2_m_status_frame.grid_propagate(False)
 
         """СДКМ"""
         sdkm_title = Frame(window, relief='raised', borderwidth=1, width=name_w, height=body_h, background='#f5fcff')
@@ -555,10 +516,6 @@ class Table():
         self.totaltime_label = Label(self.totaltime_frame, text='00:00:00', font=body_font, background='#f5fcff')
         self.totaltime_label.place(relx=0.5, rely=0.5, anchor='center')
 
-        
-
-
-    
     def warm_restart(self):
         self.restart_status = True
     
