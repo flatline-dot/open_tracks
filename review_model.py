@@ -113,6 +113,8 @@ class ParsingComports():
                         return (com, False)
                     com.reset_input_buffer()
                     return (com, response)
+                else:    
+                    return (com, response)
             else:
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
