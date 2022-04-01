@@ -47,36 +47,40 @@ class ParsingComports():
         self.info_vector_isrun = False
 
     def check_connections(self):
-        instance_ports = []
-        access_ports = [i.device for i in comports()]
-        print(access_ports)
-        
-        for port in access_ports:
-            com = Serial(port=port)
-            com.parity = PARITY_ODD
-            com.baudrate = 115200
-            com.bytesize = EIGHTBITS
-            com.timeout = 1
+        try:
+            instance_ports = []
+            access_ports = [i.device for i in comports()]
+            print(access_ports)
+            
+            for port in access_ports:
+                com = Serial(port=port)
+                com.parity = PARITY_ODD
+                com.baudrate = 115200
+                com.bytesize = EIGHTBITS
+                com.timeout = 1
 
-            com.write(self.check_request)
-            instance_ports.append(com)
+                com.write(self.check_request)
+                instance_ports.append(com)
 
-        sleep(1)
-        for com in instance_ports:
-            if com.in_waiting and com.port not in self.active_names:
-                self.active_names.append(com.port)
-                com.reset_input_buffer()
+            sleep(1)
+            for com in instance_ports:
+                if com.in_waiting and com.port not in self.active_names:
+                    self.active_names.append(com.port)
+                    com.reset_input_buffer()
 
-        for i in instance_ports:
-            i.__del__()       
-        for port in Table.table_ports:
-            if port.number in self.active_names:
-                port.title_frame['background'] = 'yellow'
-                port.title_label['background'] = 'yellow'
-            else:
-                port.title_frame['background'] = 'white'
-                port.title_label['background'] = 'white'
-        print(self.active_names)
+            for i in instance_ports:
+                i.__del__()       
+            for port in Table.table_ports:
+                if port.number in self.active_names:
+                    port.title_frame['background'] = 'yellow'
+                    port.title_label['background'] = 'yellow'
+                else:
+                    port.title_frame['background'] = 'white'
+                    port.title_label['background'] = 'white'
+            error_label['text'] = ''
+            print(self.active_names)
+        except Exception:
+            error_label['text'] = 'Error: Отказано в доступе'
 
     def init_comports(self):
         if self.active_names:
@@ -418,5 +422,11 @@ if __name__ == '__main__':
     timer_frame.grid_propagate(False)
     timer = Label(timer_frame, text='', font='Arial 14', background='white')
     timer.place(relx=0.5, rely=0.5, anchor='center')
+
+    error_frame = Frame(window, width=60, height=45, background='white')
+    error_frame.grid(columnspan=3, column=27, row=40, pady=HEAD_H, sticky='we')
+    error_frame.grid_propagate(False)
+    error_label = Label(error_frame, text='', font='Times 12 bold', background='white')
+    error_label.grid(sticky='we')
 
     window.mainloop()
