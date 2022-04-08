@@ -120,7 +120,7 @@ class ParsingComports():
                 else:    
                     return (com, response)
             else:
-                return (com, None)
+                return (com, False)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
             #sleep(3)
             com.warm_restart_start = True
@@ -129,9 +129,9 @@ class ParsingComports():
             com.write(self.request)
             com.warm_request = False
             table_port.restart_button['state'] = 'normal'
-            return (com, None)
+            return (com, False)
         else:
-            return (com, None)
+            return (com, False)
 
     def info_tracks_parse(self, com_response):
         com, response = com_response
@@ -360,73 +360,75 @@ def stop():
     print('Stop')
 
 
+comport = ParsingComports()
+Table(window, col=0, row=0, port='COM1')
+Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
+Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
+Table(window, col=12, row=0, port='COM4', pad_x=PAD_X)
+Table(window, col=16, row=0, port='COM5', pad_x=PAD_X)
+Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
+Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
+Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
+Table(window, col=0, row=20, port='COM9')
+Table(window, col=4, row=20, port='COM10', pad_x=PAD_X)
+Table(window, col=8, row=20, port='COM11', pad_x=PAD_X)
+Table(window, col=12, row=20, port='COM12', pad_x=PAD_X)
+Table(window, col=16, row=20, port='COM13', pad_x=PAD_X)
+Table(window, col=20, row=20, port='COM14', pad_x=PAD_X)
+Table(window, col=24, row=20, port='COM15', pad_x=PAD_X)
+Table(window, col=28, row=20, port='COM16', pad_x=PAD_X)
+
+frame_check = Frame(window, width=120, height=45, background='white')
+frame_check.grid(columnspan=4, column=10, row=40, pady=HEAD_H, sticky='we')
+frame_check.grid_propagate(False)
+check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.check_connections)
+check_conection.place(relx=0.5, rely=0.5, anchor='center')
+
+frame_start = Frame(window, width=80, height=45, background='white')
+frame_start.grid(columnspan=3, column=16, row=40, pady=HEAD_H, sticky='w')
+frame_start.grid_propagate(False)
+info_tracks_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=info_tracks_ctrl)
+info_tracks_button.place(relx=0.5, rely=0.5, anchor='center')
+
+frame_stop = Frame(window, width=80, height=45, background='white')
+frame_stop.grid(columnspan=3, column=23, row=40, pady=HEAD_H, sticky='w')
+frame_stop.grid_propagate(False)
+stop_button = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
+stop_button.place(relx=0.5, rely=0.5, anchor='center')
+
+frame_restart = Frame(window, width=120, height=45, background='white')
+frame_restart.grid(columnspan=4, column=6, row=40, pady=HEAD_H, sticky='we')
+frame_check.grid_propagate(False)
+warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.warm_restart_general)
+warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
+
+verctor_frame = Frame(window, width=120, height=45, background='white')
+verctor_frame.grid(columnspan=4, column=17, row=40, pady=HEAD_H, sticky='we')
+verctor_frame.grid_propagate(False)
+vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=info_vector_ctrl)
+vector_button.place(relx=0.5, rely=0.5, anchor='center')
+
+oc_general = IntVar()
+oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_general,command=comport.set_oc, background='white', borderwidth=1)
+oc_checkbok.grid(column=4, row=40)
+
+sc_general = IntVar()
+sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_general, command=comport.set_sc, background='white')
+sc_checkbok.grid(column=3, columnspan=2, row=40, sticky='w')
+
+timer_frame = Frame(window, width=120, height=45, background='white')
+timer_frame.grid(columnspan=3, column=25, row=40)
+timer_frame.grid_propagate(False)
+timer = Label(timer_frame, text='', font='Arial 14', background='white')
+timer.place(relx=0.5, rely=0.5, anchor='center')
+
+error_frame = Frame(window, width=60, height=45, background='white')
+error_frame.grid(columnspan=3, column=27, row=40, pady=HEAD_H, sticky='we')
+error_frame.grid_propagate(False)
+error_label = Label(error_frame, text='', font='Times 12 bold', background='white')
+error_label.grid(sticky='we')
+
+
+
 if __name__ == '__main__':
-    comport = ParsingComports()
-    Table(window, col=0, row=0, port='COM1')
-    Table(window, col=4, row=0, port='COM2', pad_x=PAD_X)
-    Table(window, col=8, row=0, port='COM3', pad_x=PAD_X)
-    Table(window, col=12, row=0, port='COM4', pad_x=PAD_X)
-    Table(window, col=16, row=0, port='COM5', pad_x=PAD_X)
-    Table(window, col=20, row=0, port='COM6', pad_x=PAD_X)
-    Table(window, col=24, row=0, port='COM7', pad_x=PAD_X)
-    Table(window, col=28, row=0, port='COM8', pad_x=PAD_X)
-    Table(window, col=0, row=20, port='COM9')
-    Table(window, col=4, row=20, port='COM10', pad_x=PAD_X)
-    Table(window, col=8, row=20, port='COM11', pad_x=PAD_X)
-    Table(window, col=12, row=20, port='COM12', pad_x=PAD_X)
-    Table(window, col=16, row=20, port='COM13', pad_x=PAD_X)
-    Table(window, col=20, row=20, port='COM14', pad_x=PAD_X)
-    Table(window, col=24, row=20, port='COM15', pad_x=PAD_X)
-    Table(window, col=28, row=20, port='COM16', pad_x=PAD_X)
-
-    frame_check = Frame(window, width=120, height=45, background='white')
-    frame_check.grid(columnspan=4, column=10, row=40, pady=HEAD_H, sticky='we')
-    frame_check.grid_propagate(False)
-    check_conection = Button(frame_check, text='Проверка соединения', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.check_connections)
-    check_conection.place(relx=0.5, rely=0.5, anchor='center')
-
-    frame_start = Frame(window, width=80, height=45, background='white')
-    frame_start.grid(columnspan=3, column=16, row=40, pady=HEAD_H, sticky='w')
-    frame_start.grid_propagate(False)
-    info_tracks_button = Button(frame_start, text='Старт', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=10, height=1, fg='black', command=info_tracks_ctrl)
-    info_tracks_button.place(relx=0.5, rely=0.5, anchor='center')
-
-    frame_stop = Frame(window, width=80, height=45, background='white')
-    frame_stop.grid(columnspan=3, column=23, row=40, pady=HEAD_H, sticky='w')
-    frame_stop.grid_propagate(False)
-    stop_button = Button(frame_stop, text='Cтоп', font='Arial 9 bold', borderwidth=3, background='#98d3ed', state='normal', width=10, height=1, fg='black', command=stop)
-    stop_button.place(relx=0.5, rely=0.5, anchor='center')
-
-    frame_restart = Frame(window, width=120, height=45, background='white')
-    frame_restart.grid(columnspan=4, column=6, row=40, pady=HEAD_H, sticky='we')
-    frame_check.grid_propagate(False)
-    warm_restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=comport.warm_restart_general)
-    warm_restart_button.place(relx=0.5, rely=0.5, anchor='center')
-
-    verctor_frame = Frame(window, width=120, height=45, background='white')
-    verctor_frame.grid(columnspan=4, column=17, row=40, pady=HEAD_H, sticky='we')
-    verctor_frame.grid_propagate(False)
-    vector_button = Button(verctor_frame, text='Вектор состояния', font='Arial 9 bold', borderwidth=3, background='#98d3ed', width=20, height=1, fg='black', command=info_vector_ctrl)
-    vector_button.place(relx=0.5, rely=0.5, anchor='center')
-
-    oc_general = IntVar()
-    oc_checkbok = Checkbutton(window, text='OC', font='Cambria 14 bold', variable=oc_general,command=comport.set_oc, background='white', borderwidth=1)
-    oc_checkbok.grid(column=4, row=40)
-
-    sc_general = IntVar()
-    sc_checkbok = Checkbutton(window, text='SC', font='Cambria 14 bold', variable=sc_general, command=comport.set_sc, background='white')
-    sc_checkbok.grid(column=3, columnspan=2, row=40, sticky='w')
-
-    timer_frame = Frame(window, width=120, height=45, background='white')
-    timer_frame.grid(columnspan=3, column=25, row=40)
-    timer_frame.grid_propagate(False)
-    timer = Label(timer_frame, text='', font='Arial 14', background='white')
-    timer.place(relx=0.5, rely=0.5, anchor='center')
-
-    error_frame = Frame(window, width=60, height=45, background='white')
-    error_frame.grid(columnspan=3, column=27, row=40, pady=HEAD_H, sticky='we')
-    error_frame.grid_propagate(False)
-    error_label = Label(error_frame, text='', font='Times 12 bold', background='white')
-    error_label.grid(sticky='we')
-
     window.mainloop()
