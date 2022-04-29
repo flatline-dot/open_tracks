@@ -11,7 +11,8 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-
+env_32/
+env_64/
 downloads/
 eggs/
 .eggs/
