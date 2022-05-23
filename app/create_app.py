@@ -4,12 +4,13 @@ from serial.tools.list_ports import comports
 from time import sleep
 
 
-comports_status = {f'COM{num}': {'active': False, 'psi_mode': False, 'dafault_mode': True} for num in range(1, 17)}
+comports_status = {f'COM{num}': {'active': False, 'psi_mode': False, 'dafault_mode': True, 'serial_instance': None} for num in range(1, 17)}
 ports_frames = {}
 commands = {
     'check_request': bytearray([16, 57, 16, 3]),
     'binr_mode': '$PORZA,0,115200,3*7E\r\n'.encode('ascii'),
-    'psi_mode': bytearray([10, 221, 1, 10, 3])
+    'psi_mode': bytearray([16, 221, 1, 16, 3]),
+    'default_set': bytearray([16, 221, 0, 16, 3])
 }
 
 
@@ -91,7 +92,7 @@ class StartPage(Frame):
 
         button_frame_width = container_buttons['width'] / 1.4
         button_frame_height = container_buttons['height'] / 10
-        StartPage.render_check_con()
+        StartPage.render()
         
         class ButtonFrame(Frame):
             def __init__(self, rely, text, command, container):
@@ -110,15 +111,19 @@ class StartPage(Frame):
                 button.grid_propagate(False)
 
         check_button = ButtonFrame(0.1, 'Проверка соединения', StartPage.check_con, container_buttons)
-        psi_button = ButtonFrame(0.3, 'Режим ПСИ', None, container_buttons)
+        psi_button = ButtonFrame(0.3, 'Режим ПСИ', StartPage.psi_mode, container_buttons)
         cannals_button = ButtonFrame(0.5, 'Инф. о каналах', None, container_buttons)
         vector_button = ButtonFrame(0.7, 'Вектор состояния', None, container_buttons)
-        default_button = ButtonFrame(0.9, 'Настройки по умолчанию', None, container_buttons)
+        default_button = ButtonFrame(0.9, 'Настройки по умолчанию', StartPage.default_set, container_buttons)
 
     @staticmethod
     def check_con():
         instance_ports = []
         access_ports = [i.device for i in comports()]
+        for comport in comports_status:
+            serial_instance = comports_status[comport]['serial_instance']
+            if serial_instance:
+                serial_instance.close()
         print(access_ports)
         for port in access_ports:
             try:
@@ -127,6 +132,7 @@ class StartPage(Frame):
                 com.baudrate = 115200
                 com.bytesize = EIGHTBITS
                 com.timeout = 1
+                
                 com.write(commands['check_request'])
                 instance_ports.append(com)
             except Exception:
@@ -137,9 +143,13 @@ class StartPage(Frame):
             if not com.in_waiting:
                 instance_ports.remove(com)
                 comports_status[com.port]['active'] = False
+                
             else:
                 com.reset_input_buffer()
+                comports_status[com.port]['serial_instance'] = com
                 comports_status[com.port]['active'] = True
+                #com.write(commands['binr_mode'])
+                #com.parity = PARITY_ODD
 
         StartPage.render()
         return instance_ports
@@ -150,26 +160,7 @@ class StartPage(Frame):
                 True: 'yellow',
                 False: 'silver'
         }
-        #for com in comports_status:
-        #    if comports_status[com]['active']:
-        #        port_frame = ports_frames[com]
-        #        port_frame.title_frame['background'] = 'yellow'
-        #        port_frame.title_label['background'] = 'yellow'
-        #    else:
-        #        port_frame = ports_frames[com]
-        #        port_frame.title_frame['background'] = 'silver'
-        #        port_frame.title_label['background'] = 'silver'
-        #
-        #for com in comports_status:
-        #    if comports_status[com]['psi_mode']:
-        #        port_frame = ports_frames[com]
-        #        port_frame.psi_frame['background'] = 'yellow'
-        #        port_frame.psi_label['background'] = 'yellow'
-        #    else:
-        #        port_frame = ports_frames[com]
-        #        port_frame.psi_frame['background'] = 'silver'
-        #        port_frame.psi_label['background'] = 'silver'
-        #
+
         for com in comports_status:
             port_frame = ports_frames[com]
             port_frame.title_frame['background'] = render_options[comports_status[com]['active']]
@@ -178,14 +169,27 @@ class StartPage(Frame):
             port_frame.psi_frame['background'] = render_options[comports_status[com]['psi_mode']]
             port_frame.psi_label['background'] = render_options[comports_status[com]['psi_mode']]
 
+    @staticmethod
+    def psi_mode():
+        for comport in comports_status:
+            port = comports_status[comport]
+            if port['active']:
+                serial_instance = port['serial_instance']
+                serial_instance.write(commands['psi_mode'])
+                port['psi_mode'] = True
 
-
-
-
+        StartPage.render()
 
     @staticmethod
-    def reder_con():
-        pass
+    def default_set():
+        for comport in comports_status:
+            port = comports_status[comport]
+            if port['active']:
+                serial_instance = port['serial_instance']
+                serial_instance.write(commands['default_set'])
+                port['psi_mode'] = False
+
+        StartPage.render()
 
 
 if __name__ == '__main__':
