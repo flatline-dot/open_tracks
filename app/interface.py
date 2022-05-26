@@ -1,25 +1,26 @@
 from tkinter import Tk, Frame, Label, Button, IntVar, Checkbutton
 
-window = Tk()
-window.wm_state('zoomed')
-window.title('review')
-window['background'] = 'white'
-
-NAME_W = int(window.winfo_screenwidth() / 17)
-TU_W = int(window.winfo_screenwidth() / 63.5)
-FACT_W = int(window.winfo_screenwidth() / 42.5)
-STATUS_W = int(window.winfo_screenwidth() / 44.5)
-HEAD_H = int(window.winfo_screenheight() / 33.3)
-BODY_H = int(window.winfo_screenheight() / 47)
-PAD_X = (int(window.winfo_screenwidth() / 150), 0)
-
-if TU_W <= 25:
-    BODY_FONT = 'Times 7'
-    HEAD_FONT = 8
-
-else:
-    BODY_FONT = 'Times 8'
-    HEAD_FONT = 10
+#window = Tk()
+#window.wm_state('zoomed')
+#window.title('review')
+#window['background'] = 'white'
+#
+#NAME_W = int(window.winfo_screenwidth() / 17)
+#TU_W = int(window.winfo_screenwidth() / 63.5)
+#FACT_W = int(window.winfo_screenwidth() / 42.5)
+#STATUS_W = int(window.winfo_screenwidth() / 44.5)
+#HEAD_H = int(window.winfo_screenheight() / 33.3)
+#BODY_H = int(window.winfo_screenheight() / 47)
+#PAD_X = (int(window.winfo_screenwidth() / 150), 0)
+#
+#if TU_W <= 25:
+#    BODY_FONT = 'Times 7'
+#    HEAD_FONT = 8
+#
+#else:
+#    BODY_FONT = 'Times 8'
+#    HEAD_FONT = 10
+#
 
 
 class Table():
@@ -46,7 +47,7 @@ class Table():
                  'totaltime_label', 'start_time', 'vector_status_frame', 'vector_status_label'
                  )
 
-    def __init__(self, window, col=0, row=0, port=None, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H, pad_x=(0, 0), body_font=BODY_FONT, body_h=BODY_H ,head_font=HEAD_FONT):
+    def __init__(self, window, col=0, row=0, port=None, name_w=0, tu_w=0, fact_w=0, status_w=0, head_h=0, pad_x=(0, 0), body_font=0, body_h=0 ,head_font=0):
         Table.table_ports.append(self)
         Table.table_ports_dict[port] = self
         self.number = port
@@ -78,12 +79,12 @@ class Table():
 
 
 
-        self.vector_status_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
-        self.vector_status_frame.grid_propagate(False)
-        self.vector_status_frame.grid(row=2 + row, column=col, columnspan=4, padx=pad_x)
-
-        self.vector_status_label = Label(self.vector_status_frame, text='Вектор состояния', font=f'{body_font} bold', background='#f5fcff')
-        self.vector_status_label.place(relx=0.5, rely=0.5, anchor='center')
+        #self.vector_status_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
+        #self.vector_status_frame.grid_propagate(False)
+        #self.vector_status_frame.grid(row=2 + row, column=col, columnspan=4, padx=pad_x)
+#
+        #self.vector_status_label = Label(self.vector_status_frame, text='Вектор состояния', font=f'{body_font} bold', background='#f5fcff')
+        #self.vector_status_label.place(relx=0.5, rely=0.5, anchor='center')
 
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
