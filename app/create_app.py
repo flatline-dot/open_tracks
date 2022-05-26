@@ -59,6 +59,7 @@ class App(Tk):
         super().__init__(*args, **kwargs)
         self.wm_state('zoomed')
         self['background'] = 'white'
+        self.info_tracks_isrun = False
 
         container = Frame(self, background='white')
         container.pack(side='top', fill='both', expand=True)
@@ -305,22 +306,30 @@ class InfoTracks(Frame):
         frame_stop = Frame(buttonframe, width=buttonframe_width / 8, height=buttonframe_height / 2, background='white', borderwidth=1, relief='solid')
         frame_stop.place(relx=0.3, rely=0.5, anchor='center')
         frame_stop.grid_propagate(False)
-        self.stop_button = Button(frame_stop, text='Стоп', font='Arial 8 bold', borderwidth=3, background='silver', width=10, height=1, fg='black', command=self.stop)
+        self.stop_button = Button(frame_stop, text='Стоп', font='Arial 8 bold', borderwidth=3, background='silver', width=10, height=1, fg='black', command=self.stop, state='disabled')
         self.stop_button.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_restart = Frame(buttonframe, width=buttonframe_width / 6, height=buttonframe_height / 2, background='white')
         frame_restart.place(relx=0.5, rely=0.5, anchor='center')
         frame_stop.grid_propagate(False)
-        self.restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 8 bold', borderwidth=3, background='silver', width=20, height=1, fg='black', command=self.restart)
+        self.restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 8 bold', borderwidth=3, background='silver', width=20, height=1, fg='black', command=self.restart, state='disabled')
         self.restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
         self.oc_general = IntVar()
-        self.oc_checkbok = Checkbutton(buttonframe, text='OC', font='Cambria 14 bold', variable=self.oc_general, command=self.set_oc, background='white', borderwidth=1)
+        self.oc_checkbok = Checkbutton(buttonframe, text='OC', font='Cambria 14 bold', variable=self.oc_general, command=self.set_oc, background='white', borderwidth=1, state='disabled')
         self.oc_checkbok.place(relx=0.7, rely=0.5, anchor='center')
 
         self.sc_general = IntVar()
-        self.sc_checkbok = Checkbutton(buttonframe, text='SC', font='Cambria 14 bold', variable=self.sc_general, command=self.set_sc, background='white')
+        self.sc_checkbok = Checkbutton(buttonframe, text='SC', font='Cambria 14 bold', variable=self.sc_general, command=self.set_sc, background='white', state='disabled')
         self.sc_checkbok.place(relx=0.8, rely=0.5, anchor='center')
+
+        backframe_width = self.winfo_screenwidth() / 15
+        backframe_height = self.winfo_screenheight() / 14
+        backframe = Frame(self, width=backframe_width, height=backframe_height, borderwidth=1, relief='solid')
+        backframe.grid(columnspan=3, column=0, row=39)
+        backframe.grid_propagate(False)
+        self.back_button = Button(backframe, text='Назад', font='Arial 8 bold', borderwidth=3, background='silver', width=15, height=1, fg='black', command=lambda: controller.show_frame(StartPage))
+        self.back_button.place(relx=0.5, rely=0.5, anchor='center')
 
     @staticmethod
     def info_tracks_read(com):
@@ -330,6 +339,7 @@ class InfoTracks(Frame):
                 response += com.read(com.in_waiting)
                 if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                     if commands['response_21'] in response or commands['response_25'] in response or commands['response_27'] in response or commands['response_restart'] in response or commands['response_restart_2'] in response:
+                        print('OK')
                         return (com, False)
                     com.reset_input_buffer()
                     return (com, response)
@@ -351,7 +361,6 @@ class InfoTracks(Frame):
 
     @staticmethod
     def info_tracks_parse(com_response):
-        print(com_response)
         com, response = com_response
         if response:
             code_list = []
@@ -377,7 +386,6 @@ class InfoTracks(Frame):
     @staticmethod
     def info_tracks_rendering(com_results):
         com, results = com_results
-        print(com.port)
         table_port = Table.table_ports_dict[com.port]
         if table_port.start_time == 'Restart':
             table_port.totaltime_label['text'] = 'Restart'
@@ -433,8 +441,7 @@ class InfoTracks(Frame):
             table_port.sc_complite = False
 
         for com in [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
-            com.vector_status = False
-            com.write(commands['warm_request'])
+            com.write(commands['warm_restart'])
 
         sleep(3)
 
@@ -455,27 +462,39 @@ class InfoTracks(Frame):
             table_port.var_sc.set(1)
 
     def start(self):
+        App.info_tracks_isrun = True
         self.start_button['state'] = 'disabled'
+        self.restart_button['state'] = 'normal'
+        self.stop_button['state'] = 'normal'
+        self.oc_checkbok['state'] = 'normal'
+        self.sc_checkbok['state'] = 'normal'
         ready_ports = [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]
 
         [port.write(commands['request_info_tracks']) for port in ready_ports]
-        print(Table.table_ports_dict)
         for table in Table.table_ports_dict:
             table_port = Table.table_ports_dict[table]
             table_port.start_time = time()
-
+        
         def running():
-            read_results = [InfoTracks.info_tracks_read(port) for port in ready_ports]
-            parse_results = [InfoTracks.info_tracks_parse(port) for port in read_results]
-            [InfoTracks.info_tracks_rendering(port) for port in parse_results]
-            Tk.after(app, 100, running)
+            if App.info_tracks_isrun:
+                read_results = [InfoTracks.info_tracks_read(port) for port in ready_ports]
+                parse_results = [InfoTracks.info_tracks_parse(port) for port in read_results]
+                [InfoTracks.info_tracks_rendering(port) for port in parse_results]
+                Tk.after(app, 100, running)
 
         running()
 
     def stop(self):
-        pass
-
-
+        self.start_button['state'] = 'normal'
+        self.restart_button['state'] = 'disabled'
+        self.stop_button['state'] = 'disabled'
+        self.oc_checkbok['state'] = 'disabled'
+        self.sc_checkbok['state'] = 'disabled'
+        App.info_tracks_isrun = False
+        ready_ports = [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]
+        [port.write(commands['stop_request']) for port in ready_ports]
+        sleep(0.5)
+        [port.reset_input_buffer() for port in ready_ports]
 
 
 
