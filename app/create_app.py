@@ -88,7 +88,7 @@ class StartPage(Frame):
         window_height = self.winfo_screenheight()
 
         container_buttons = Frame(self, width=window_width / 8, height=window_height / 2,
-                                  borderwidth=2, relief='raised', background='white')
+                                  borderwidth=6, relief='groove', background='white')
 
         container_buttons.grid()
         container_buttons.grid_propagate(False)
@@ -100,16 +100,18 @@ class StartPage(Frame):
         container_ports.grid_propagate(False)
 
         class PortFrame(Frame):
-            def __init__(self, title, *args, **kwargs):
-                super().__init__(*args, **kwargs)
+            def __init__(self, title, container, *args, **kwargs):
+                super().__init__(container)
                 self['width'] = window_width / 12
                 self['height'] = window_height / 16
+                self['borderwidth'] = 0
+                self['background'] = 'white'
                 self.grid_propagate(False)
 
                 self.title_frame = Frame(self, width=self['width'], height=self['height'] / 2, borderwidth=1, relief='solid')
                 self.title_frame.grid(row=0, column=0)
                 self.title_frame.grid_propagate(False)
-                self.title_label = Label(self.title_frame, text=title, font='Times 11')
+                self.title_label = Label(self.title_frame, text=title, font='Times 14', background='white')
                 self.title_label.place(relx=0.5, rely=0.5, anchor='center')
 
                 self.psi_frame = Frame(self, width=self['width'], height=self['height'] / 2, borderwidth=1, relief='solid')
@@ -122,19 +124,19 @@ class StartPage(Frame):
         low_row = ['COM9', 'COM10', 'COM11', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16']
 
         for title in high_row:
-            frame = PortFrame(title, master=container_ports)
+            frame = PortFrame(title, container_ports)
             ports_frames[title] = frame
             frame.grid(row=0, column=high_row.index(title), padx=(0, 30), pady=(70, 50))
 
         for title in low_row:
-            frame = PortFrame(title, master=container_ports)
+            frame = PortFrame(title, container_ports)
             ports_frames[title] = frame
             frame.grid(row=1, column=low_row.index(title), padx=(0, 30), pady=(0, 50))
 
         button_frame_width = container_buttons['width'] / 1.4
         button_frame_height = container_buttons['height'] / 10
         StartPage.render()
-        
+
         class ButtonFrame(Frame):
             def __init__(self, rely, text, command, container):
                 super().__init__(container)
@@ -147,7 +149,7 @@ class StartPage(Frame):
                 self.place(relx=0.5, rely=rely, anchor='center')
                 self.grid_propagate(False)
 
-                button = Button(self, text=text, width=22, height=2, borderwidth=2, font='Times 8 bold', relief='groove', command=command)
+                button = Button(self, text=text, width=22, height=2, borderwidth=2, font='Times 8 bold', relief='raised', command=command)
                 button.place(relx=0.5, rely=0.5, anchor='center')
                 button.grid_propagate(False)
 
@@ -198,7 +200,7 @@ class StartPage(Frame):
     def render():
         render_options = {
                 True: 'yellow',
-                False: 'silver'
+                False: 'white'
         }
 
         for com in comports_status:
@@ -235,27 +237,6 @@ class StartPage(Frame):
 class InfoTracks(Frame):
     def __init__(self, parent, controller, comports_status):
         super().__init__(parent)
-        
-
-        self.request = bytearray([16, 57, 1, 16, 3])
-        #self.check_request = bytearray([16, 57, 16, 3])
-        self.stop_request = bytearray([16, 14, 16, 3])
-        self.warm_restart = bytearray([16, 1, 0, 1, 33, 1, 0, 0, 16, 3])
-        self.param_21 = bytearray([16, 215, 21, 2, 16, 3])
-        self.param_25 = bytearray([16, 215, 25, 2, 16, 3])
-        self.param_27 = bytearray([16, 215, 27, 1, 16, 3])
-        self.vector_request = bytearray([16, 39, 1, 16, 3])
-        self.response_restart = bytearray([16, 67, 5, 0, 16, 3])
-        self.response_restart_2 = bytearray([16, 67, 5, 1, 16, 3]) 
-        self.response_21 = bytearray([16, 231, 21, 2, 16, 3])
-        self.response_25 = bytearray([16, 231, 25, 2, 16, 3])
-        self.response_27 = bytearray([16, 231, 27, 1, 16, 3])
-        #self.active_names = []
-        #self.active_ports = []
-        self.info_tracks_isrun = False
-        self.info_vector_isrun = False
-
-
         self['background'] = 'white'
 
         NAME_W = int(self.winfo_screenwidth() / 17)
@@ -292,44 +273,44 @@ class InfoTracks(Frame):
         Table(self, col=28, row=20, port='COM16', pad_x=PAD_X, body_font=BODY_FONT, body_h=BODY_H, head_font=HEAD_FONT, name_w=NAME_W, tu_w=TU_W, fact_w=FACT_W, status_w=STATUS_W, head_h=HEAD_H)
 
         buttonframe_width = self.winfo_screenwidth() / 2
-        buttonframe_height = self.winfo_screenheight() / 14
-        buttonframe = Frame(self, width=buttonframe_width, height=buttonframe_height, borderwidth=1, relief='solid')
-        buttonframe.grid(columnspan=20, column=5)
+        buttonframe_height = self.winfo_screenheight() / 12
+        buttonframe = Frame(self, width=buttonframe_width, height=buttonframe_height, background='white')
+        buttonframe.grid(columnspan=20, column=6)
         buttonframe.grid_propagate(False)
 
         frame_start = Frame(buttonframe, width=buttonframe_width / 7, height=buttonframe_height / 2, background='white')
-        frame_start.place(relx=0.1, rely=0.5, anchor='center')
+        frame_start.place(relx=0.1, rely=0.7, anchor='center')
         frame_start.grid_propagate(False)
-        self.start_button = Button(frame_start, text='Старт', font='Arial 8 bold', borderwidth=3, background='silver', width=10, height=1, fg='black', command=self.start)
+        self.start_button = Button(frame_start, text='Старт', font='Arial 8 bold', borderwidth=2, background='silver', width=10, height=2, fg='black', command=self.start, relief='raised')
         self.start_button.place(relx=0.5, rely=0.5, anchor='center')
 
-        frame_stop = Frame(buttonframe, width=buttonframe_width / 8, height=buttonframe_height / 2, background='white', borderwidth=1, relief='solid')
-        frame_stop.place(relx=0.3, rely=0.5, anchor='center')
+        frame_stop = Frame(buttonframe, width=buttonframe_width / 8, height=buttonframe_height / 2, background='white')
+        frame_stop.place(relx=0.3, rely=0.7, anchor='center')
         frame_stop.grid_propagate(False)
-        self.stop_button = Button(frame_stop, text='Стоп', font='Arial 8 bold', borderwidth=3, background='silver', width=10, height=1, fg='black', command=self.stop, state='disabled')
+        self.stop_button = Button(frame_stop, text='Стоп', font='Arial 8 bold', borderwidth=2, background='silver', width=10, height=2, fg='black', command=self.stop, state='disabled', relief='raised')
         self.stop_button.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_restart = Frame(buttonframe, width=buttonframe_width / 6, height=buttonframe_height / 2, background='white')
-        frame_restart.place(relx=0.5, rely=0.5, anchor='center')
+        frame_restart.place(relx=0.5, rely=0.7, anchor='center')
         frame_stop.grid_propagate(False)
-        self.restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 8 bold', borderwidth=3, background='silver', width=20, height=1, fg='black', command=self.restart, state='disabled')
+        self.restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 8 bold', borderwidth=2, background='silver', width=20, height=2, fg='black', command=self.restart, state='disabled', relief='raised')
         self.restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
         self.oc_general = IntVar()
         self.oc_checkbok = Checkbutton(buttonframe, text='OC', font='Cambria 14 bold', variable=self.oc_general, command=self.set_oc, background='white', borderwidth=1, state='disabled')
-        self.oc_checkbok.place(relx=0.7, rely=0.5, anchor='center')
+        self.oc_checkbok.place(relx=0.7, rely=0.7, anchor='center')
 
         self.sc_general = IntVar()
         self.sc_checkbok = Checkbutton(buttonframe, text='SC', font='Cambria 14 bold', variable=self.sc_general, command=self.set_sc, background='white', state='disabled')
-        self.sc_checkbok.place(relx=0.8, rely=0.5, anchor='center')
+        self.sc_checkbok.place(relx=0.8, rely=0.7, anchor='center')
 
         backframe_width = self.winfo_screenwidth() / 15
         backframe_height = self.winfo_screenheight() / 14
-        backframe = Frame(self, width=backframe_width, height=backframe_height, borderwidth=1, relief='solid')
+        backframe = Frame(self, width=backframe_width, height=backframe_height, background='white')
         backframe.grid(columnspan=3, column=0, row=39)
         backframe.grid_propagate(False)
-        self.back_button = Button(backframe, text='Назад', font='Arial 8 bold', borderwidth=3, background='silver', width=15, height=1, fg='black', command=lambda: controller.show_frame(StartPage))
-        self.back_button.place(relx=0.5, rely=0.5, anchor='center')
+        self.back_button = Button(backframe, text='Назад', font='Arial 8 bold', borderwidth=2, background='silver', width=15, height=2, fg='black', command=lambda: controller.show_frame(StartPage), relief='raised')
+        self.back_button.place(relx=0.5, rely=0.7, anchor='center')
 
     @staticmethod
     def info_tracks_read(com):
@@ -348,7 +329,7 @@ class InfoTracks(Frame):
             else:
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
-            #sleep(3)
+            # sleep(3)
             com.warm_restart_start = True
             table_port = Table.table_ports_dict[com.port]
             table_port.start_time = time()
@@ -361,6 +342,7 @@ class InfoTracks(Frame):
 
     @staticmethod
     def info_tracks_parse(com_response):
+        #print(com_response)
         com, response = com_response
         if response:
             code_list = []
@@ -418,8 +400,6 @@ class InfoTracks(Frame):
             table_port.var_sc.set(0)
             table_port.oc_complite = False
             table_port.sc_complite = False
-        #else:
-        #    table_port.restart_button['state'] = 'normal'
 
         if table_port.var_oc.get() and not table_port.oc_complite:
             com.write(commands['param_21'])
@@ -446,7 +426,7 @@ class InfoTracks(Frame):
         sleep(3)
 
         for com in [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
-            com.write(self.request)
+            com.write(commands['request_info_tracks'])
         for table in Table.table_ports_dict:
             table_port = Table.table_ports_dict[table]
             table_port.start_time = time()
@@ -463,6 +443,7 @@ class InfoTracks(Frame):
 
     def start(self):
         App.info_tracks_isrun = True
+        self.back_button['state'] = 'disabled'
         self.start_button['state'] = 'disabled'
         self.restart_button['state'] = 'normal'
         self.stop_button['state'] = 'normal'
@@ -474,7 +455,7 @@ class InfoTracks(Frame):
         for table in Table.table_ports_dict:
             table_port = Table.table_ports_dict[table]
             table_port.start_time = time()
-        
+
         def running():
             if App.info_tracks_isrun:
                 read_results = [InfoTracks.info_tracks_read(port) for port in ready_ports]
@@ -485,6 +466,7 @@ class InfoTracks(Frame):
         running()
 
     def stop(self):
+        self.back_button['state'] = 'normal'
         self.start_button['state'] = 'normal'
         self.restart_button['state'] = 'disabled'
         self.stop_button['state'] = 'disabled'
@@ -495,28 +477,6 @@ class InfoTracks(Frame):
         [port.write(commands['stop_request']) for port in ready_ports]
         sleep(0.5)
         [port.reset_input_buffer() for port in ready_ports]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
