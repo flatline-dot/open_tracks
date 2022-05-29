@@ -66,13 +66,13 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, InfoTracks):
+        for F in (StartPage, InfoTracks, VectorPage):
             frame = F(container, self, comports_status)
 
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky='nsew')
 
-        self.show_frame(StartPage)
+        self.show_frame(VectorPage)
 
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -477,6 +477,91 @@ class InfoTracks(Frame):
         [port.write(commands['stop_request']) for port in ready_ports]
         sleep(0.5)
         [port.reset_input_buffer() for port in ready_ports]
+
+
+class VectorPage(Frame):
+    def __init__(self, parent, controller, comports_status):
+        super().__init__(parent)
+        self['background'] = 'white'
+
+        window_width = self.winfo_screenwidth()
+        window_height = self.winfo_screenheight()
+
+        container_ports = Frame(self, width=window_width, height=window_height / 2,
+                                borderwidth=0, relief='solid', background='white')
+
+        container_ports.grid(row=0, column=2, padx=(window_width / 10, 0))
+        container_ports.grid_propagate(False)
+
+        class PortFrame(Frame):
+            def __init__(self, title, container, *args, **kwargs):
+                super().__init__(container)
+                self['width'] = window_width / 12
+                self['height'] = window_height / 8
+                self['borderwidth'] = 0
+                self['background'] = 'white'
+                self.grid_propagate(False)
+
+                self.title_frame = Frame(self, width=self['width'], height=self['height'] / 4, borderwidth=1, relief='solid', background='white')
+                self.title_frame.grid(row=0, column=0)
+                self.title_frame.grid_propagate(False)
+                self.title_label = Label(self.title_frame, text=title, font='Times 14', background='white')
+                self.title_label.place(relx=0.5, rely=0.5, anchor='center')
+
+                self.vector_frame = Frame(self, width=self['width'], height=self['height'] / 4, borderwidth=1, relief='solid', background='white')
+                self.vector_frame.grid(row=1, column=0)
+                self.vector_frame.grid_propagate(False)
+                self.vector_label = Label(self.vector_frame, text='Вектор состояния', font='Times 11', background='white')
+                self.vector_label.place(relx=0.5, rely=0.5, anchor='center')
+
+                self.time_frame = Frame(self, width=self['width'], height=self['height'] / 4, borderwidth=1, relief='solid', background='white')
+                self.time_frame.grid(row=2, column=0)
+                self.time_frame.grid_propagate(False)
+                self.time_label = Label(self.time_frame, text='Таймер', font='Times 14', background='white')
+                self.time_label.place(relx=0.5, rely=0.5, anchor='center')
+
+                self.restart_frame = Frame(self, width=self['width'], height=self['height'] / 4, borderwidth=1, relief='solid', background='white')
+                self.restart_frame.grid(row=3, column=0)
+                self.restart_frame.grid_propagate(False)
+                self.restrt_label = Label(self.restart_frame, text='Restart', font='Times 11', background='white')
+                self.restrt_label.place(relx=0.5, rely=0.5, anchor='center')
+
+        high_row = ['COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8']
+        low_row = ['COM9', 'COM10', 'COM11', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16']
+
+        for title in high_row:
+            frame = PortFrame(title, container_ports)
+            ports_frames[title] = frame
+            frame.grid(row=0, column=high_row.index(title), padx=(0, 30), pady=(70, 50))
+
+        for title in low_row:
+            frame = PortFrame(title, container_ports)
+            ports_frames[title] = frame
+            frame.grid(row=1, column=low_row.index(title), padx=(0, 30), pady=(0, 50))
+
+        buttonframe_width = window_width / 2
+        buttonframe_height = window_height / 12
+        buttonframe = Frame(self, width=buttonframe_width, height=buttonframe_height, background='white', borderwidth=1)
+        buttonframe.grid(columnspan=20)
+        buttonframe.grid_propagate(False)
+
+        frame_start = Frame(buttonframe, width=buttonframe_width / 7, height=buttonframe_height / 2, background='white')
+        frame_start.place(relx=0.1, rely=0.7, anchor='center')
+        frame_start.grid_propagate(False)
+        self.start_button = Button(frame_start, text='Старт', font='Arial 8 bold', borderwidth=2, background='silver', width=10, height=2, fg='black', command=None, relief='raised')
+        self.start_button.place(relx=0.5, rely=0.5, anchor='center')
+
+        frame_stop = Frame(buttonframe, width=buttonframe_width / 8, height=buttonframe_height / 2, background='white')
+        frame_stop.place(relx=0.3, rely=0.7, anchor='center')
+        frame_stop.grid_propagate(False)
+        self.stop_button = Button(frame_stop, text='Стоп', font='Arial 8 bold', borderwidth=2, background='silver', width=10, height=2, fg='black', command=None, state='disabled', relief='raised')
+        self.stop_button.place(relx=0.5, rely=0.5, anchor='center')
+
+        frame_restart = Frame(buttonframe, width=buttonframe_width / 6, height=buttonframe_height / 2, background='white')
+        frame_restart.place(relx=0.5, rely=0.7, anchor='center')
+        frame_stop.grid_propagate(False)
+        self.restart_button = Button(frame_restart, text='Холодный перезапуск', font='Arial 8 bold', borderwidth=2, background='silver', width=20, height=2, fg='black', command=None, state='disabled', relief='raised')
+        self.restart_button.place(relx=0.5, rely=0.5, anchor='center')
 
 
 if __name__ == '__main__':
