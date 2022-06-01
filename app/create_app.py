@@ -29,7 +29,7 @@ commands = {
     'response_21': bytearray([16, 231, 21, 2, 16, 3]),
     'response_25': bytearray([16, 231, 25, 2, 16, 3]),
     'response_27': bytearray([16, 231, 27, 1, 16, 3]),
-    'vision_spuntik': bytearray([16, 33, 1, 16, 3])
+    'vision_sputnik': bytearray([16, 33, 1, 16, 3])
 }
 
 
@@ -840,19 +840,20 @@ class VisionSputnik(Frame):
 
     def vision_rendering(self, com_results):
         com, result = com_results
-        table_port = VisionSputnik.vectortables[com.port]
-
-        if com.visoin_sputnik_is:
+        table_port = VisionSputnik.visiontables[com.port]
+        print(result)
+        if com.vision_sputnik_is:
             return None
         else:
-            table_port.vision_label['text'] = str(result['GPS']) + 'GPS' + '+' + str(result['GLN']) + 'GLN'
-            if result['GPS'] >= 6 and result['GLN'] >= 6:
-                table_port.vision_frame['background'] = 'green'
-                table_port.vision_label['background'] = 'green'
-                com.vision_spuntik_is = True
-            else:
-                table_port.vision_frame['background'] = 'red'
-                table_port.vision_frame['background'] = 'red'
+            if result:
+                table_port.vision_label['text'] = str(result['GPS']) + 'GPS' + '+' + str(result['GLN']) + 'GLN'
+                if result['GPS'] >= 6 and result['GLN'] >= 6:
+                    table_port.vision_frame['background'] = 'green'
+                    table_port.vision_label['background'] = 'green'
+                    com.vision_spuntik_is = True
+                else:
+                    table_port.vision_frame['background'] = 'red'
+                    table_port.vision_frame['background'] = 'red'
 
         if table_port.restart_status:
             com.write(commands['stop_request'])
