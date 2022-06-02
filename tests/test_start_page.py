@@ -4,10 +4,10 @@ from time import sleep
 
 def test_check_con():
     application = app.App()
-    
+
     app.StartPage.check_con()
     app.StartPage.psi_mode()
-    
+
     assert app.comports_status['COM2']['active']
     assert app.comports_status['COM2']['psi_mode']
     assert app.comports_status['COM2']['serial_instance'].port == "COM2"

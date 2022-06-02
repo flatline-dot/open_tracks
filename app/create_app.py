@@ -814,12 +814,12 @@ class VisionSputnik(Frame):
                     return (com, None)
             else:
                 return (com, None)
-        elif com.warm_request:
+        elif com.warm_request and ((time() - com.warm_restart_start) > 3):
             #sleep(3)
             com.warm_restart_start = True
-            table_port = VisionSputnik.vectortables[com.port]
+            table_port = VisionSputnik.visiontables[com.port]
             table_port.start_time = time()
-            com.write(commands['vision_spuntnik'])
+            com.write(commands['vision_sputnik'])
             com.warm_request = False
             table_port.restart_button['state'] = 'normal'
             return (com, None)
@@ -841,6 +841,8 @@ class VisionSputnik(Frame):
     def vision_rendering(self, com_results):
         com, result = com_results
         table_port = VisionSputnik.visiontables[com.port]
+        table_port.title_frame['background'] = 'yellow'
+        table_port.title_label['background'] = 'yellow'
         print(result)
         if com.vision_sputnik_is:
             return None
@@ -853,11 +855,12 @@ class VisionSputnik(Frame):
                     com.vision_spuntik_is = True
                 else:
                     table_port.vision_frame['background'] = 'red'
-                    table_port.vision_frame['background'] = 'red'
+                    table_port.vision_label['background'] = 'red'
 
         if table_port.restart_status:
             com.write(commands['stop_request'])
             com.write(commands['warm_restart'])
+            com.warm_restart_start = time()
             table_port.restart_status = False
             table_port.restart_button['state'] = 'disabled'
             com.warm_request = True
