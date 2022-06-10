@@ -3,6 +3,7 @@ from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
 from time import time, sleep
 from interface import Table
+from collections import Counter
 
 
 comports_status = {
@@ -805,9 +806,8 @@ class VisionSputnik(Frame):
         if not com.warm_request:
             if com.in_waiting >= 4:
                 response += com.read(com.in_waiting)
-                if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
+                if (response[0] == 16 and response[1] == 82) and (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                     com.reset_input_buffer()
-                    print(response)
                     return (com, response)
                 else:
                     com.reset_input_buffer()
@@ -838,13 +838,12 @@ class VisionSputnik(Frame):
         sputnik_count = 0
         if response:
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-            print(len(response))
-            print(response)
-            print(len(response_clear))
-            print(response_clear)
             sputnik_count = int(len(response_clear[2:-2]) / 7)
             system_index = 2
             signal_index = 8
+
+            c = Counter()
+
             for _ in range(sputnik_count):
                 #if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
                 system = int(response_clear[system_index:system_index + 1].hex(), 16)
@@ -852,7 +851,9 @@ class VisionSputnik(Frame):
                 systems_list.append(sputnik_code[system])
                 system_index += 7
                 signal_index += 7
-            print(systems_list)
+            for system in systems_list:
+                c[system] += 1
+            print(c)
             return (com, False)
         else:
             return(com, False)
