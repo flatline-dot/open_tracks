@@ -1,26 +1,4 @@
-from tkinter import Tk, Frame, Label, Button, IntVar, Checkbutton
-
-#window = Tk()
-#window.wm_state('zoomed')
-#window.title('review')
-#window['background'] = 'white'
-#
-#NAME_W = int(window.winfo_screenwidth() / 17)
-#TU_W = int(window.winfo_screenwidth() / 63.5)
-#FACT_W = int(window.winfo_screenwidth() / 42.5)
-#STATUS_W = int(window.winfo_screenwidth() / 44.5)
-#HEAD_H = int(window.winfo_screenheight() / 33.3)
-#BODY_H = int(window.winfo_screenheight() / 47)
-#PAD_X = (int(window.winfo_screenwidth() / 150), 0)
-#
-#if TU_W <= 25:
-#    BODY_FONT = 'Times 7'
-#    HEAD_FONT = 8
-#
-#else:
-#    BODY_FONT = 'Times 8'
-#    HEAD_FONT = 10
-#
+from tkinter import Frame, Label, Button, IntVar, Checkbutton
 
 
 class Table():
@@ -47,7 +25,7 @@ class Table():
                  'totaltime_label', 'start_time', 'vector_status_frame', 'vector_status_label'
                  )
 
-    def __init__(self, window, col=0, row=0, port=None, name_w=0, tu_w=0, fact_w=0, status_w=0, head_h=0, pad_x=(0, 0), body_font=0, body_h=0 ,head_font=0):
+    def __init__(self, window, col=0, row=0, port=None, name_w=0, tu_w=0, fact_w=0, status_w=0, head_h=0, pad_x=(0, 0), body_font=0, body_h=0, head_font=0):
         Table.table_ports.append(self)
         Table.table_ports_dict[port] = self
         self.number = port
@@ -61,7 +39,7 @@ class Table():
         self.title.grid_propagate(False)
         self.title.grid(row=0 + row, column=col, columnspan=4, padx=pad_x, pady=(3, 0))
 
-        self.title_frame = Frame(self.title, borderwidth=1, relief='raised', width= tu_w + status_w + 5, height=28, background='white')
+        self.title_frame = Frame(self.title, borderwidth=1, relief='raised', width=tu_w + status_w + 5, height=28, background='white')
         self.title_frame.grid_propagate(False)
         self.title_frame.grid()
 
@@ -76,16 +54,6 @@ class Table():
 
         sc_checkbox = Checkbutton(self.title, text='SC', font='Cambria 10 bold', variable=self.var_sc, background='white')
         sc_checkbox.place(relx=0.7, rely=0.5, anchor='center')
-
-
-
-        #self.vector_status_frame = Frame(window, borderwidth=1, relief='raised', width=name_w + tu_w + fact_w + status_w, height=23, background='white')
-        #self.vector_status_frame.grid_propagate(False)
-        #self.vector_status_frame.grid(row=2 + row, column=col, columnspan=4, padx=pad_x)
-#
-        #self.vector_status_label = Label(self.vector_status_frame, text='Вектор состояния', font=f'{body_font} bold', background='#f5fcff')
-        #self.vector_status_label.place(relx=0.5, rely=0.5, anchor='center')
-
 
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=3 + row, padx=pad_x)
@@ -257,7 +225,7 @@ class Table():
         self.gln_l1oc_d_status_frame.grid_propagate(False)
 
         """GLONASS L1SC"""
-        l1sc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h *2), background='#f5fcff')
+        l1sc_mix = Frame(window, relief='raised', borderwidth=1, width=int(name_w * 0.7), height=int(body_h * 2), background='#f5fcff')
         l1sc_mix.grid(row=10 + row, column=0 + col, sticky='w', padx=pad_x)
         l1sc_mix.grid_propagate(False)
         l1sc_mix_label = Label(l1sc_mix, text='ГЛН L1SC', font=body_font, background='#f5fcff')
@@ -302,7 +270,7 @@ class Table():
         l1sc_d_fact = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=body_h, background='#f5fcff')
         l1sc_d_fact.grid(row=10 + row, column=2 + col, sticky='s')
         l1sc_d_fact.grid_propagate(False)
-        self.gln_l1sc_d_fact= Label(l1sc_d_fact, text='0', font=body_font, background='#f5fcff')
+        self.gln_l1sc_d_fact = Label(l1sc_d_fact, text='0', font=body_font, background='#f5fcff')
         self.gln_l1sc_d_fact.place(relx=0.5, rely=0.5, anchor='center')
 
         self.gln_l1sc_d_status_frame = Frame(window, relief='raised', borderwidth=1, width=status_w, height=body_h, background='#f5fcff')
@@ -519,4 +487,3 @@ class Table():
 
     def warm_restart(self):
         self.restart_status = True
-    

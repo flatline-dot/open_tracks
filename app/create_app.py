@@ -1,4 +1,3 @@
-from pydoc import visiblename
 from tkinter import Tk, Frame, Label, Button, IntVar, Checkbutton
 from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
@@ -29,7 +28,7 @@ commands = {
     'response_21': bytearray([16, 231, 21, 2, 16, 3]),
     'response_25': bytearray([16, 231, 25, 2, 16, 3]),
     'response_27': bytearray([16, 231, 27, 1, 16, 3]),
-    'vision_sputnik': bytearray([16, 33, 1, 16, 3])
+    'vision_sputnik': bytearray([16, 36, 1, 16, 3])
 }
 
 
@@ -804,10 +803,11 @@ class VisionSputnik(Frame):
     def vision_read(com):
         response = b''
         if not com.warm_request:
-            if com.in_waiting >= 8:
+            if com.in_waiting >= 4:
                 response += com.read(com.in_waiting)
                 if (response[-1] == 3) and (response[-2] == 16) and (response[-3] != 16):
                     com.reset_input_buffer()
+                    print(response)
                     return (com, response)
                 else:
                     com.reset_input_buffer()
@@ -829,12 +829,31 @@ class VisionSputnik(Frame):
     @staticmethod
     def vision_parse(com_response):
         com, response = com_response
-        vision_result = {}
+        sputnik_code = {
+            1: 'GPS',
+            2: 'GLN',
+            4: 'SBAS'
+        }
+        systems_list = []
+        sputnik_count = 0
         if response:
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
-            vision_result['GPS'] = int(response_clear[2:3].hex(), 16)
-            vision_result['GLN'] = int(response_clear[3:4].hex(), 16)
-            return (com, vision_result)
+            print(len(response))
+            print(response)
+            print(len(response_clear))
+            print(response_clear)
+            sputnik_count = int(len(response_clear[2:-2]) / 7)
+            system_index = 2
+            signal_index = 8
+            for _ in range(sputnik_count):
+                #if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
+                system = int(response_clear[system_index:system_index + 1].hex(), 16)
+                print(response_clear[system_index:system_index + 1])
+                systems_list.append(sputnik_code[system])
+                system_index += 7
+                signal_index += 7
+            print(systems_list)
+            return (com, False)
         else:
             return(com, False)
 
@@ -843,7 +862,6 @@ class VisionSputnik(Frame):
         table_port = VisionSputnik.visiontables[com.port]
         table_port.title_frame['background'] = 'yellow'
         table_port.title_label['background'] = 'yellow'
-        print(result)
         if com.vision_sputnik_is:
             return None
         else:
@@ -883,8 +901,9 @@ class VisionSputnik(Frame):
         self.restart_button['state'] = 'normal'
         self.stop_button['state'] = 'normal'
         ready_ports = [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]
-
+        [port.reset_input_buffer() for port in ready_ports]
         [port.write(commands['vision_sputnik']) for port in ready_ports]
+
         #for table in VisionSputnik.vectortables:
         #    table_port = VisionSputnik.vectortables[table]
 
@@ -902,7 +921,7 @@ class VisionSputnik(Frame):
         self.start_button['state'] = 'normal'
         self.restart_button['state'] = 'disabled'
         self.stop_button['state'] = 'disabled'
-        App.vision_sputnik_is = False
+        App.vision_sputnik_isrun = False
         ready_ports = [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]
         [port.write(commands['stop_request']) for port in ready_ports]
         sleep(0.5)

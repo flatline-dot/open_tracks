@@ -1,6 +1,9 @@
-from urllib import response
-import app.create_app as app
+import sys
+#sys.path.append('C:\\Users\\stolypinskij_gv\\source\\repos\\flatline-dot\\open_track')
+#print(sys.path)
+from ..app import create_app
 from time import sleep
+
 
 
 def test_read_info_tracks():
