@@ -7,7 +7,7 @@ from collections import Counter
 
 
 comports_status = {
-    f'COM{num}': {'active': False, 'psi_mode': False, 'dafault_mode': True, 'serial_instance': None,
+    'COM' + str(num): {'active': False, 'psi_mode': False, 'dafault_mode': True, 'serial_instance': None,
                   'warm_request': False, 'vector_status': False} for num in range(1, 17)
     }
 
@@ -189,7 +189,7 @@ class StartPage(Frame):
                 com.write(commands['check_request'])
                 instance_ports.append(com)
             except Exception:
-                print(f'{com}: Отказано в доступе.')
+                print(str(com) + ' : Отказано в доступе.')
 
         sleep(1)
         for com in instance_ports.copy():
@@ -387,7 +387,7 @@ class InfoTracks(Frame):
         else:
             current_time = int(time() - table_port.start_time)
             if current_time <= 36:
-                table_port.totaltime_label['text'] = f'00:00:{ current_time }'
+                table_port.totaltime_label['text'] = '00:00:' + str(current_time )
 
         if results:
             table_port.title_frame['background'] = 'yellow'
@@ -637,7 +637,7 @@ class VectorPage(Frame):
         else:
             current_time = int(time() - table_port.start_time)
             if current_time <= 36:
-                table_port.totaltime_label['text'] = f'00:00:{ current_time }'
+                table_port.totaltime_label['text'] = '00:00:' + str(current_time)
 
         if com.vector_status:
             return None

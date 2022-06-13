@@ -58,25 +58,25 @@ class Table():
         frame_names = Frame(window, relief='raised', borderwidth=1, width=name_w, height=head_h - 7, background='#bbd0f2')
         frame_names.grid(column=0 + col, row=3 + row, padx=pad_x)
         frame_names.grid_propagate(False)
-        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font=f'Times {head_font} bold', background='#bbd0f2')
+        label_names = Label(frame_names, text='Диапозон', borderwidth=1, font='Times ' + str(head_font) + ' bold', background='#bbd0f2')
         label_names.place(relx=0.5, rely=0.5, anchor='center')
 
         frame_const = Frame(window, relief='raised', borderwidth=1, width=tu_w, height=head_h - 7, background='#bbd0f2')
         frame_const.grid(row=3 + row, column=1 + col)
         frame_const.grid_propagate(False)
-        label_const = Label(frame_const, text='ТУ', font=f'Times {head_font} bold', background='#bbd0f2')
+        label_const = Label(frame_const, text='ТУ', font='Times ' + str(head_font) + ' bold', background='#bbd0f2')
         label_const.place(relx=0.45, rely=0.5, anchor='center')
 
         frame_count = Frame(window, relief='raised', borderwidth=1, width=fact_w, height=head_h - 7, background='#bbd0f2')
         frame_count.grid(row=3 + row, column=2 + col)
         frame_count.grid_propagate(False)
-        frame_count = Label(frame_count, text='Факт.', font=f'Times {head_font -1} bold', background='#bbd0f2')
+        frame_count = Label(frame_count, text='Факт.', font='Times ' + str(head_font - 1) + ' bold', background='#bbd0f2')
         frame_count.place(relx=0.445, rely=0.5, anchor='center')
 
         frame_status = Frame(window, relief='raised', borderwidth=1, width=status_w, height=head_h - 7, background='#bbd0f2')
         frame_status.grid(row=3 + row, column=3 + col)
         frame_status.grid_propagate(False)
-        label_status = Label(frame_status, text='Реш.', font=f'Times {head_font - 1} bold', background='#bbd0f2')
+        label_status = Label(frame_status, text='Реш.', font='Times ' + str(head_font - 1) + ' bold', background='#bbd0f2')
         label_status.place(relx=0.5, rely=0.5, anchor='center')
 
         """GLONASS L1OF"""
