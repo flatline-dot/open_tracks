@@ -5,9 +5,10 @@ description = ""
 authors = ["stolypinskij_gv <stolypinskij_gv@NAVEL-048>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 pyserial = "3.5"
 flake8 = "^4.0.1"
+pyinstaller = "^5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
