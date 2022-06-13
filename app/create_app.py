@@ -399,7 +399,7 @@ class InfoTracks(Frame):
         else:
             current_time = int(time() - table_port.start_time)
             if current_time <= 36:
-                table_port.totaltime_label['text'] = '00:00:' + str(current_time )
+                table_port.totaltime_label['text'] = '00:00:' + str(current_time)
 
         if results:
             table_port.title_frame['background'] = 'yellow'
@@ -616,7 +616,6 @@ class VectorPage(Frame):
             else:
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
-            #sleep(3)
             com.warm_restart_start = True
             table_port = VectorPage.vectortables[com.port]
             table_port.start_time = time()
