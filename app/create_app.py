@@ -3,12 +3,11 @@ from serial import Serial, PARITY_ODD, EIGHTBITS
 from serial.tools.list_ports import comports
 from time import time, sleep
 from interface import Table
-from collections import Counter
 
 
 comports_status = {
     'COM' + str(num): {'active': False, 'psi_mode': False, 'dafault_mode': True, 'serial_instance': None,
-                  'warm_request': False, 'vector_status': False} for num in range(1, 17)
+                       'warm_request': False, 'vector_status': False} for num in range(1, 17)
     }
 
 ports_frames = {}
@@ -78,6 +77,18 @@ class App(Tk):
 
     def show_frame(self, cont):
         frame = self.frames[cont]
+
+        if isinstance(frame, VectorPage):
+            for table in [value for key, value in frame.vectortables.items()]:
+                table.vector_label['background'] = 'white'
+                table.vector_frame['background'] = 'white'
+
+        if isinstance(frame, VisionSputnik):
+            for table in [value for key, value in frame.visiontables.items()]:
+                table.vision_label['background'] = 'white'
+                table.vision_label['text'] = '0 GPS + 0 GLN + 0 SBAS'
+                table.vision_frame['background'] = 'white'
+
         frame.tkraise()
 
 
@@ -206,6 +217,7 @@ class StartPage(Frame):
                 comports_status[com.port]['active'] = True
 
         StartPage.render()
+        #if [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
         for frame in StartPage.perm_buttons:
             frame.button['state'] = 'normal'
         return instance_ports
@@ -742,7 +754,7 @@ class VisionSputnik(Frame):
                 self.vision_frame = Frame(self, width=self['width'], height=self['height'] / 4, borderwidth=1, relief='solid', background='white')
                 self.vision_frame.grid(row=1, column=0)
                 self.vision_frame.grid_propagate(False)
-                self.vision_label = Label(self.vision_frame, text='0 GPS + 0 GLN', font='Times 11', background='white')
+                self.vision_label = Label(self.vision_frame, text='0 GPS + 0 GLN + 0 SBAS', font='Times 10', background='white')
                 self.vision_label.place(relx=0.5, rely=0.5, anchor='center')
 
                 self.restart_frame = Frame(self, width=self['width'], height=self['height'] / 5, borderwidth=1, relief='solid', background='white')
@@ -834,7 +846,12 @@ class VisionSputnik(Frame):
             2: 'GLN',
             4: 'SBAS'
         }
-        systems_list = []
+
+        result = {
+            'GPS': 0,
+            'GLN': 0,
+            'SBAS': 0
+        }
         sputnik_count = 0
         if response:
             response_clear = response.replace(bytes.fromhex('10') + bytes.fromhex('10'), bytes.fromhex('10'))
@@ -842,19 +859,14 @@ class VisionSputnik(Frame):
             system_index = 2
             signal_index = 8
 
-            c = Counter()
-
             for _ in range(sputnik_count):
                 #if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
                 system = int(response_clear[system_index:system_index + 1].hex(), 16)
-                print(response_clear[system_index:system_index + 1])
-                systems_list.append(sputnik_code[system])
+                result[sputnik_code[system]] += 1
                 system_index += 7
                 signal_index += 7
-            for system in systems_list:
-                c[system] += 1
-            print(c)
-            return (com, False)
+
+            return (com, result)
         else:
             return(com, False)
 
@@ -863,18 +875,8 @@ class VisionSputnik(Frame):
         table_port = VisionSputnik.visiontables[com.port]
         table_port.title_frame['background'] = 'yellow'
         table_port.title_label['background'] = 'yellow'
-        if com.vision_sputnik_is:
-            return None
-        else:
-            if result:
-                table_port.vision_label['text'] = str(result['GPS']) + 'GPS' + '+' + str(result['GLN']) + 'GLN'
-                if result['GPS'] >= 6 and result['GLN'] >= 6:
-                    table_port.vision_frame['background'] = 'green'
-                    table_port.vision_label['background'] = 'green'
-                    com.vision_spuntik_is = True
-                else:
-                    table_port.vision_frame['background'] = 'red'
-                    table_port.vision_label['background'] = 'red'
+
+        table_port.vision_label['text'] = str(result['GPS']) + ' GPS' + '+' + str(result['GLN']) + ' GLN' + str(result['SBAS']) + ' SBAS'
 
         if table_port.restart_status:
             com.write(commands['stop_request'])
@@ -904,9 +906,6 @@ class VisionSputnik(Frame):
         ready_ports = [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]
         [port.reset_input_buffer() for port in ready_ports]
         [port.write(commands['vision_sputnik']) for port in ready_ports]
-
-        #for table in VisionSputnik.vectortables:
-        #    table_port = VisionSputnik.vectortables[table]
 
         def running():
             if App.vision_sputnik_isrun:
