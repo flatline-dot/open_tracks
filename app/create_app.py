@@ -217,9 +217,9 @@ class StartPage(Frame):
                 comports_status[com.port]['active'] = True
 
         StartPage.render()
-        #if [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
-        for frame in StartPage.perm_buttons:
-            frame.button['state'] = 'normal'
+        if [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
+            for frame in StartPage.perm_buttons:
+                frame.button['state'] = 'normal'
         return instance_ports
 
     @staticmethod
@@ -356,6 +356,7 @@ class InfoTracks(Frame):
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
             # sleep(3)
+            com.reset_input_buffer()
             com.warm_restart_start = True
             table_port = Table.table_ports_dict[com.port]
             table_port.start_time = time()
@@ -451,6 +452,7 @@ class InfoTracks(Frame):
         sleep(3)
 
         for com in [comports_status[com]['serial_instance'] for com in comports_status if comports_status[com]['active']]:
+            com.reset_input_buffer()
             com.write(commands['request_info_tracks'])
         for table in Table.table_ports_dict:
             table_port = Table.table_ports_dict[table]
@@ -616,6 +618,7 @@ class VectorPage(Frame):
             else:
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
+            com.reset_input_buffer()
             com.warm_restart_start = True
             table_port = VectorPage.vectortables[com.port]
             table_port.start_time = time()
@@ -679,6 +682,7 @@ class VectorPage(Frame):
             com.write(commands['warm_restart'])
         sleep(3)
         for com in worker_ports:
+            com.reset_input_buffer()
             com.write(commands['vector_request'])
         for table_port in VectorPage.vectortables:
             table_port = VectorPage.vectortables[table_port]
@@ -827,6 +831,7 @@ class VisionSputnik(Frame):
                 return (com, None)
         elif com.warm_request and ((time() - com.warm_restart_start) > 3):
             #sleep(3)
+            com.reset_input_buffer()
             com.warm_restart_start = True
             table_port = VisionSputnik.visiontables[com.port]
             table_port.start_time = time()
@@ -857,14 +862,12 @@ class VisionSputnik(Frame):
             sputnik_count = int(len(response_clear[2:-2]) / 7)
             system_index = 2
             signal_index = 8
-
             for _ in range(sputnik_count):
-                #if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
-                system = int(response_clear[system_index:system_index + 1].hex(), 16)
-                result[sputnik_code[system]] += 1
+                if int(response_clear[signal_index:signal_index + 1].hex(), 16) > 0:
+                    system = int(response_clear[system_index:system_index + 1].hex(), 16)
+                    result[sputnik_code[system]] += 1
                 system_index += 7
                 signal_index += 7
-
             return (com, result)
         else:
             return(com, False)
@@ -874,8 +877,8 @@ class VisionSputnik(Frame):
         table_port = VisionSputnik.visiontables[com.port]
         table_port.title_frame['background'] = 'yellow'
         table_port.title_label['background'] = 'yellow'
-
-        table_port.vision_label['text'] = str(result['GPS']) + ' GPS' + '+' + str(result['GLN']) + ' GLN' + str(result['SBAS']) + ' SBAS'
+        if result:
+            table_port.vision_label['text'] = str(result['GPS']) + ' GPS' + '+' + str(result['GLN']) + ' GLN' + str(result['SBAS']) + ' SBAS'
 
         if table_port.restart_status:
             com.write(commands['stop_request'])
@@ -894,6 +897,7 @@ class VisionSputnik(Frame):
             com.write(commands['warm_restart'])
         sleep(3)
         for com in worker_ports:
+            com.reset_input_buffer()
             com.write(commands['vision_sputnik'])
 
     def start(self):
